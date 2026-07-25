@@ -15,13 +15,19 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private float gravity = -9.81f;
 
     [Header("Look")]
-    [SerializeField] private float mouseSensitivity = 0.1f;
+    [SerializeField] private float mouseSensitivity = 0.25f;
     [Tooltip("Camera to rotate for looking up/down. Defaults to Camera.main if unset.")]
     [SerializeField] private Transform cameraTransform;
+
+    [Header("Animation")]
+    [Tooltip("Drives the 'Speed' float parameter (0 = idle, 1 = walking). Defaults to a child Animator if unset.")]
+    [SerializeField] private Animator animator;
 
     private CharacterController characterController;
     private Vector3 velocity;
     private float pitch;
+
+    private static readonly int SpeedParam = Animator.StringToHash("Speed");
 
     private void Awake()
     {
@@ -30,6 +36,11 @@ public class FirstPersonController : MonoBehaviour
         if (cameraTransform == null && Camera.main != null)
         {
             cameraTransform = Camera.main.transform;
+        }
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
         }
     }
 
@@ -79,6 +90,11 @@ public class FirstPersonController : MonoBehaviour
         if (move.sqrMagnitude > 1f)
         {
             move.Normalize();
+        }
+
+        if (animator != null)
+        {
+            animator.SetFloat(SpeedParam, move.magnitude);
         }
 
         // Reset downward velocity while grounded so gravity doesn't accumulate.
