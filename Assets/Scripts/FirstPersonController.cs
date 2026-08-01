@@ -11,6 +11,8 @@ public class FirstPersonController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float acceleration = 12f;
+    [SerializeField] private float deceleration = 16f;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravity = -9.81f;
 
@@ -25,6 +27,7 @@ public class FirstPersonController : MonoBehaviour
 
     private CharacterController characterController;
     private Vector3 velocity;
+    private Vector3 horizontalVelocity;
     private float pitch;
 
     private static readonly int SpeedParam = Animator.StringToHash("Speed");
@@ -86,15 +89,21 @@ public class FirstPersonController : MonoBehaviour
             (keyboard.dKey.isPressed ? 1f : 0f) - (keyboard.aKey.isPressed ? 1f : 0f),
             (keyboard.wKey.isPressed ? 1f : 0f) - (keyboard.sKey.isPressed ? 1f : 0f));
 
-        Vector3 move = (transform.right * input.x + transform.forward * input.y);
-        if (move.sqrMagnitude > 1f)
+        Vector3 moveDirection = (transform.right * input.x + transform.forward * input.y);
+        if (moveDirection.sqrMagnitude > 1f)
         {
-            move.Normalize();
+            moveDirection.Normalize();
         }
+
+        // Smoothly accelerate toward the target velocity and decelerate toward zero
+        // so movement doesn't snap instantly to full speed or stop dead.
+        Vector3 targetVelocity = moveDirection * moveSpeed;
+        float rate = targetVelocity.sqrMagnitude > horizontalVelocity.sqrMagnitude ? acceleration : deceleration;
+        horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, targetVelocity, rate * Time.deltaTime);
 
         if (animator != null)
         {
-            animator.SetFloat(SpeedParam, move.magnitude);
+            animator.SetFloat(SpeedParam, horizontalVelocity.magnitude / moveSpeed);
         }
 
         // Reset downward velocity while grounded so gravity doesn't accumulate.
@@ -110,7 +119,7 @@ public class FirstPersonController : MonoBehaviour
 
         velocity.y += gravity * Time.deltaTime;
 
-        Vector3 displacement = move * moveSpeed + Vector3.up * velocity.y;
+        Vector3 displacement = horizontalVelocity + Vector3.up * velocity.y;
         characterController.Move(displacement * Time.deltaTime);
     }
 }
