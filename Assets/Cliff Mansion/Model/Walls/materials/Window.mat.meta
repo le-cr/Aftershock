@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4dd082fad29b8a84a9ad45154e8b8b2e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 202818
+  packageName: Cliff Mansion (URP)
+  packageVersion: 1.1
+  assetPath: Assets/Cliff Mansion/Model/Walls/materials/Window.mat
+  uploadId: 459206

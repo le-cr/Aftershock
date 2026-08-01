@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: aa01da33f5f511f4e916e617cc6c8e34
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 202818
+  packageName: Cliff Mansion (URP)
+  packageVersion: 1.1
+  assetPath: Assets/Cliff Mansion/Scene/SceneLighting.lighting
+  uploadId: 459206

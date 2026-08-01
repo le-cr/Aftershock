@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0b7dac2bf682cfd43a02fba06cf88371
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 202818
+  packageName: Cliff Mansion (URP)
+  packageVersion: 1.1
+  assetPath: Assets/Cliff Mansion/Model/Walls/materials/Baseboard.mat
+  uploadId: 459206

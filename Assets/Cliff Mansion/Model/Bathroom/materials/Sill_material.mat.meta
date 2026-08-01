@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: de402428aa1f6844798d492f8f0b4557
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 202818
+  packageName: Cliff Mansion (URP)
+  packageVersion: 1.1
+  assetPath: Assets/Cliff Mansion/Model/Bathroom/materials/Sill_material.mat
+  uploadId: 459206
