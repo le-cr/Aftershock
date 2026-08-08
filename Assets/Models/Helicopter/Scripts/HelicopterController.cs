@@ -158,6 +158,16 @@ public class HelicopterController : MonoBehaviour
 
     }
 
+    public void ResetControls()
+    {
+        EngineForce = 0f;
+        hMove = Vector2.zero;
+        hTilt = Vector2.zero;
+        hTurn = 0f;
+        HelicopterModel.linearVelocity = Vector3.zero;
+        HelicopterModel.angularVelocity = Vector3.zero;
+    }
+
     private void OnCollisionEnter()
     {
         IsOnGround = true;
