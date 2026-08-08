@@ -6061,7 +6061,7 @@ MonoBehaviour:
   jumpHeight: 1.5
   gravity: -9.81
   mouseSensitivity: 0.25
-  cameraTransform: {fileID: 0}
+  cameraTransform: {fileID: 330585546}
   animator: {fileID: 0}
 --- !u!114 &1506980804
 MonoBehaviour:
