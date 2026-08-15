@@ -18,7 +18,6 @@ public class FirstPersonController : MonoBehaviour
 
     [Header("Look")]
     [SerializeField] private float mouseSensitivity = 0.25f;
-    [SerializeField] private float keyboardTurnSpeed = 90f;
     [Tooltip("Camera to rotate for looking up/down. Defaults to Camera.main if unset.")]
     [SerializeField] private Transform cameraTransform;
 
@@ -50,7 +49,8 @@ public class FirstPersonController : MonoBehaviour
 
     private void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
@@ -61,24 +61,18 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleLook()
     {
-        if (cameraTransform == null)
+        if (Mouse.current == null || cameraTransform == null)
         {
             return;
         }
 
-        float yaw = 0f;
-
-        if (Keyboard.current != null)
-        {
-            // A/D turn the camera left/right instead of strafing.
-            float keyboardYaw = (Keyboard.current.dKey.isPressed ? 1f : 0f) - (Keyboard.current.aKey.isPressed ? 1f : 0f);
-            yaw += keyboardYaw * keyboardTurnSpeed * Time.deltaTime;
-        }
+        Vector2 mouseDelta = Mouse.current.delta.ReadValue() * mouseSensitivity;
 
         // Yaw rotates the whole body left/right.
-        transform.Rotate(Vector3.up * yaw);
+        transform.Rotate(Vector3.up * mouseDelta.x);
 
         // Pitch rotates only the camera up/down, clamped to avoid flipping over.
+        pitch = Mathf.Clamp(pitch - mouseDelta.y, -90f, 90f);
         cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
@@ -90,10 +84,12 @@ public class FirstPersonController : MonoBehaviour
             return;
         }
 
-        // W/S move forward/backward relative to where the player is facing.
-        float forwardInput = (keyboard.wKey.isPressed ? 1f : 0f) - (keyboard.sKey.isPressed ? 1f : 0f);
+        // Read WASD as a direction relative to where the player is facing.
+        Vector2 input = new Vector2(
+            (keyboard.dKey.isPressed ? 1f : 0f) - (keyboard.aKey.isPressed ? 1f : 0f),
+            (keyboard.wKey.isPressed ? 1f : 0f) - (keyboard.sKey.isPressed ? 1f : 0f));
 
-        Vector3 moveDirection = transform.forward * forwardInput;
+        Vector3 moveDirection = (transform.right * input.x + transform.forward * input.y);
         if (moveDirection.sqrMagnitude > 1f)
         {
             moveDirection.Normalize();
