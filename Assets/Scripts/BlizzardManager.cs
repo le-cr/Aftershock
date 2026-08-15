@@ -31,7 +31,7 @@ public class BlizzardManager : MonoBehaviour
                 GameObject hitObject = triggerComponent.gameObject;
                 if (hitObject.CompareTag("Player"))
                 {
-                    playerController.timesTouchedSnow++;
+                    playerController.touchingSnow = true;
                 }
             }
         }

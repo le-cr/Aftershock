@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6388868722181513214}
   - component: {fileID: 3574838380033272910}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: MainCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -285,7 +285,9 @@ MonoBehaviour:
   timeSpentInWater: 0
   maxTimeSpentInWater: 30
   floodTimeMultiplier: 1.5
+  damage: -0.05
   timeInWaterText: {fileID: 0}
+  healthBar: {fileID: 0}
 --- !u!1 &7889491495498787976
 GameObject:
   m_ObjectHideFlags: 0

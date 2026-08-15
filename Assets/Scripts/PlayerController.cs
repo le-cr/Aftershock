@@ -4,6 +4,7 @@ using TMPro;
 public class PlayerController : MonoBehaviour
 {
     public bool inWater;
+    public bool touchingSnow;
     public int timesTouchedSnow = 0;
     public float timeSpentInWater = 0f;
     [SerializeField] float maxTimeSpentInWater = 10f;
@@ -23,6 +24,13 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         timeSinceDamage += Time.deltaTime;
+        if (touchingSnow)
+        {
+            if (timeSinceDamage > 1f) {
+                healthBar.ChangeHealth(damage);
+                timeSinceDamage = 0f;
+            }
+        }
         if (inWater)
         {
             timeSpentInWater += Time.deltaTime * floodTimeMultiplier;
@@ -31,15 +39,6 @@ public class PlayerController : MonoBehaviour
                 healthBar.ChangeHealth(damage);
                 timeSinceDamage = 0f;
             }
-
-        }
-        if (timesTouchedSnow > 10000)
-        {
-            Debug.Log("player takes damage");
-        }
-        if (timeSpentInWater > maxTimeSpentInWater)
-        {
-            Debug.Log("player takes damage");
         }
     }
 }
