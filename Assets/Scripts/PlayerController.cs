@@ -6,9 +6,12 @@ public class PlayerController : MonoBehaviour
     public bool inWater;
     public int timesTouchedSnow = 0;
     public float timeSpentInWater = 0f;
-    [SerializeField] float maxTimeSpentInWater = 30f;
+    [SerializeField] float maxTimeSpentInWater = 10f;
     [SerializeField] float floodTimeMultiplier = 1.5f;
+    [SerializeField] float damage = -0.05f;
     [SerializeField] TMP_Text timeInWaterText;
+    [SerializeField] HealthBar healthBar;
+    private float timeSinceDamage = 0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -19,11 +22,16 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(timeSpentInWater);
+        timeSinceDamage += Time.deltaTime;
         if (inWater)
         {
             timeSpentInWater += Time.deltaTime * floodTimeMultiplier;
             timeInWaterText.text = "Time spent in water: " + ((int)Mathf.Round(timeSpentInWater)).ToString();
+            if (timeSinceDamage > 1f) {
+                healthBar.ChangeHealth(damage);
+                timeSinceDamage = 0f;
+            }
+
         }
         if (timesTouchedSnow > 10000)
         {
