@@ -11,10 +11,16 @@ public class FirstPersonController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float acceleration = 12f;
-    [SerializeField] private float deceleration = 16f;
+    [Tooltip("Units/s² ramp up to full speed. High values keep starts snappy; ~100 reaches moveSpeed in about a frame or two.")]
+    [SerializeField] private float acceleration = 100f;
+    [Tooltip("Units/s² ramp down to a stop. Keep at or above acceleration so stops don't feel slidey.")]
+    [SerializeField] private float deceleration = 120f;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravity = -9.81f;
+    [Tooltip("Extra gravity while falling, so the descent feels snappier than the rise.")]
+    [SerializeField] private float fallMultiplier = 2.5f;
+    [Tooltip("Extra gravity while rising if jump is released early, allowing short hops.")]
+    [SerializeField] private float lowJumpMultiplier = 2f;
 
     [Header("Look")]
     [SerializeField] private float mouseSensitivity = 0.25f;
@@ -95,8 +101,8 @@ public class FirstPersonController : MonoBehaviour
             moveDirection.Normalize();
         }
 
-        // Smoothly accelerate toward the target velocity and decelerate toward zero
-        // so movement doesn't snap instantly to full speed or stop dead.
+        // Ramp toward the target velocity fast enough to feel instant, while still
+        // smoothing over a frame or two so the animator blend doesn't pop.
         Vector3 targetVelocity = moveDirection * moveSpeed;
         float rate = targetVelocity.sqrMagnitude > horizontalVelocity.sqrMagnitude ? acceleration : deceleration;
         horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, targetVelocity, rate * Time.deltaTime);
@@ -117,7 +123,19 @@ public class FirstPersonController : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
 
-        velocity.y += gravity * Time.deltaTime;
+        // Better jumping (Board To Bits): fall faster than we rise, and cut the
+        // jump short when the button is released early for variable jump height.
+        float gravityScale = 1f;
+        if (velocity.y < 0f)
+        {
+            gravityScale = fallMultiplier;
+        }
+        else if (velocity.y > 0f && !keyboard.spaceKey.isPressed)
+        {
+            gravityScale = lowJumpMultiplier;
+        }
+
+        velocity.y += gravity * gravityScale * Time.deltaTime;
 
         Vector3 displacement = horizontalVelocity + Vector3.up * velocity.y;
         characterController.Move(displacement * Time.deltaTime);

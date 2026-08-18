@@ -3,13 +3,15 @@ using UnityEngine.InputSystem;
 
 public class Flood : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] PlayerController playerController;
     [SerializeField] GameObject waterTintPanel;
-    [SerializeField] GameObject timeInWaterText;
 
-    bool isFlooding;
+    [Header("Constants")]
     [SerializeField] float floodSpeed = 1f;
     [SerializeField] float maxFloodHeight = 10f;
+
+    private bool isFlooding;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -36,21 +38,19 @@ public class Flood : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("WaterDetection"))
         {
             playerController.inWater = true;
             waterTintPanel.SetActive(true);
-            timeInWaterText.SetActive(true);
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("WaterDetection"))
         {
             playerController.inWater = false;
             waterTintPanel.SetActive(false);
-            timeInWaterText.SetActive(false);
         }
     }
 }

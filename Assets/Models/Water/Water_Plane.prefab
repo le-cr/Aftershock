@@ -119,8 +119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   playerController: {fileID: 0}
   waterTintPanel: {fileID: 0}
-  timeInWaterText: {fileID: 0}
-  floodSpeed: 1
+  floodSpeed: 0.5
   maxFloodHeight: 10
 --- !u!65 &1901935918063601977
 BoxCollider:

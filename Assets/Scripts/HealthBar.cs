@@ -20,6 +20,5 @@ public class HealthBar : MonoBehaviour
     public void ChangeHealth(float value)
     {
         imageComponent.fillAmount += value;
-        Debug.Log(imageComponent.fillAmount);
     }
 }
