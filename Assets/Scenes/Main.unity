@@ -7856,7 +7856,6 @@ Transform:
   - {fileID: 564360438}
   - {fileID: 1478725344}
   - {fileID: 1812155857}
-  - {fileID: 1929861211}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &775501060
@@ -19376,11 +19375,14 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1925187240}
   m_Mesh: {fileID: 4300072, guid: f55006f6a32a71b45a114b4680c1e575, type: 3}
+<<<<<<< HEAD
 --- !u!4 &1929861211 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5886998314316771999, guid: 65e8986d3d1624dc180ea9261fc703a1, type: 3}
   m_PrefabInstance: {fileID: 3895383043035818111}
   m_PrefabAsset: {fileID: 0}
+=======
+>>>>>>> parent of 717dc27 (Break building using t key, remove unecessary scripts)
 --- !u!1 &1953107463
 GameObject:
   m_ObjectHideFlags: 0
