@@ -39,12 +39,19 @@ public class BuildingCollapse : MonoBehaviour
     [Tooltip("Angular damping on the fragments.")]
     public float fragmentAngularDrag = 1.5f;
 
+    [Header("Damage")]
+    [Tooltip("Let the fragments hurt the player when they hit them. The amount and the rate limit live on PlayerController.")]
+    public bool debrisHurtsPlayer = true;
+
     [Header("Cleanup")]
     [Tooltip("Destroy the rubble after it has settled.")]
     public bool despawnFragments = false;
 
     [Tooltip("Seconds before the rubble is destroyed, if despawning is enabled.")]
     public float fragmentLifetime = 30f;
+
+    /// <summary>True once this building has been broken apart. Fracturing is one-way.</summary>
+    public bool HasCollapsed => collapsed;
 
     bool collapsed;
 
@@ -110,6 +117,7 @@ public class BuildingCollapse : MonoBehaviour
         {
             body.isKinematic = false;
             body.useGravity = true;
+
             body.linearDamping = fragmentDrag;
             body.angularDamping = fragmentAngularDrag;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;

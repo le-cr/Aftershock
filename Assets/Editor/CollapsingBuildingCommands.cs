@@ -152,6 +152,93 @@ namespace Aftershock.Editor
             return new { triggered = target, playing = Application.isPlaying };
         }
 
+        [CliCommand("toggle_camera_shake",
+            "Toggle the earthquake camera shake without a key press. Intended for testing in play mode.")]
+        public static object ToggleCameraShake(
+            [CliArg("target", "Hierarchy path of the GameObject carrying CameraShake.")]
+            string target = "/CameraShake")
+        {
+            var go = GameObject.Find(target);
+            if (go == null)
+                throw new System.ArgumentException($"No GameObject found at '{target}'.");
+
+            var shake = go.GetComponent<CameraShake>();
+            if (shake == null)
+                throw new System.ArgumentException($"'{target}' has no CameraShake component.");
+
+            shake.Toggle();
+
+            var camera = Camera.main;
+            return new
+            {
+                shaking = shake.IsShaking,
+                playing = Application.isPlaying,
+                activeCamera = camera != null ? camera.name : null,
+            };
+        }
+
+        [CliCommand("set_camera_enabled",
+            "Enable or disable a Camera at runtime. Mirrors what HelicopterInteraction does on F, for testing the camera swap in play mode.")]
+        public static object SetCameraEnabled(
+            [CliArg("target", "Hierarchy path of the GameObject carrying the Camera.", Required = true)]
+            string target,
+            [CliArg("enabled", "Whether the camera should be on.")]
+            bool enabled = true)
+        {
+            var go = GameObject.Find(target);
+            if (go == null)
+                throw new System.ArgumentException($"No GameObject found at '{target}'.");
+
+            var camera = go.GetComponent<Camera>();
+            if (camera == null)
+                throw new System.ArgumentException($"'{target}' has no Camera component.");
+
+            camera.enabled = enabled;
+
+            return new { target, enabled = camera.enabled, playing = Application.isPlaying };
+        }
+
+        [CliCommand("toggle_earthquake",
+            "Toggle the earthquake (camera shake + staggered building collapse) without a key press. Intended for testing in play mode.")]
+        public static object ToggleEarthquake(
+            [CliArg("target", "Hierarchy path of the GameObject carrying Earthquake.")]
+            string target = "/Earthquake")
+        {
+            var go = GameObject.Find(target);
+            if (go == null)
+                throw new System.ArgumentException($"No GameObject found at '{target}'.");
+
+            var quake = go.GetComponent<Earthquake>();
+            if (quake == null)
+                throw new System.ArgumentException($"'{target}' has no Earthquake component.");
+
+            quake.Toggle();
+
+            return new { quaking = quake.IsQuaking, playing = Application.isPlaying };
+        }
+
+        [CliCommand("get_player_health",
+            "Read the player's current health bar fill, for verifying debris damage in play mode.")]
+        public static object GetPlayerHealth(
+            [CliArg("target", "Hierarchy path of the GameObject carrying the HealthBar Image.")]
+            string target = null)
+        {
+            var bar = string.IsNullOrEmpty(target)
+                ? Object.FindFirstObjectByType<HealthBar>()
+                : GameObject.Find(target)?.GetComponent<HealthBar>();
+
+            if (bar == null)
+                throw new System.ArgumentException("No HealthBar found in the open scene.");
+
+            var image = bar.GetComponent<UnityEngine.UI.Image>();
+            return new
+            {
+                healthBar = bar.gameObject.name,
+                fillAmount = image != null ? image.fillAmount : -1f,
+                playing = Application.isPlaying,
+            };
+        }
+
         /// <summary>
         /// Combines every MeshFilter under <paramref name="instance"/> into one mesh in the
         /// instance's local space and saves it as an asset, so it survives a scene save.
