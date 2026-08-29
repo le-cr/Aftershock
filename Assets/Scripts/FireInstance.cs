@@ -18,6 +18,8 @@ public class FireInstance : MonoBehaviour
     private AudioSource audioSource;
     private GameObject lightChild;
     private bool tamed;
+    private bool lightOn;
+    private Vector3 baseScale;
 
     /// <summary>Cell or building this instance is currently attached to. Managed by WildfireManager.</summary>
     public object Owner { get; set; }
@@ -28,6 +30,7 @@ public class FireInstance : MonoBehaviour
             return;
 
         tamed = true;
+        baseScale = transform.localScale;
         systems = GetComponentsInChildren<ParticleSystem>(true);
 
         foreach (var ps in systems)
@@ -63,11 +66,24 @@ public class FireInstance : MonoBehaviour
         }
     }
 
-    /// <summary>Only the handful of fires nearest the player carry a real-time light.</summary>
+    /// <summary>Scale the whole effect. Called on acquisition so one prefab covers many sizes.</summary>
+    public void SetScale(float scale)
+    {
+        transform.localScale = baseScale * scale;
+    }
+
+    /// <summary>
+    /// Only the handful of fires nearest the player carry a real-time light. Guarded on the
+    /// cached state: this is called every tick for every visible fire, and redundant SetActive
+    /// calls are not free.
+    /// </summary>
     public void SetLightEnabled(bool enabled)
     {
-        if (lightChild != null)
-            lightChild.SetActive(enabled);
+        if (lightChild == null || lightOn == enabled)
+            return;
+
+        lightOn = enabled;
+        lightChild.SetActive(enabled);
     }
 
     public void Play()

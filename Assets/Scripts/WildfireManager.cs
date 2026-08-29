@@ -5,7 +5,10 @@ using UnityEngine.Pool;
 
 /// <summary>
 /// Runs the wildfire: ignites beside the player and spreads outward as an advancing front for
-/// the whole survival window, burning the collapsing buildings down on its way through.
+/// the whole survival window.
+///
+/// Buildings are deliberately NOT set alight here: fracturing them mid-wildfire crashed the game.
+/// Building collapse belongs to EarthquakeManager alone.
 ///
 /// The simulation and the visuals are deliberately separate. Spread is a lightweight logical
 /// grid of cells; the fire VFX are a small pooled set attached only to burning cells near the
@@ -28,12 +31,6 @@ public class WildfireManager : MonoBehaviour
         public FireInstance vfx;
     }
 
-    class BurningBuilding
-    {
-        public BuildingCollapse building;
-        public float ignitedAt;
-        public FireInstance vfx;
-    }
 
     [Header("Area")]
     [Tooltip("Centre of the burnable area, in world space.")]
@@ -43,7 +40,7 @@ public class WildfireManager : MonoBehaviour
     [SerializeField] Vector2 areaSize = new Vector2(104f, 88f);
 
     [Tooltip("Metres between ignition cells. Larger = fewer cells and a coarser front.")]
-    [SerializeField] float cellSpacing = 10f;
+    [SerializeField] float cellSpacing = 16f;
 
     [Header("Spread")]
     [Tooltip("Seconds a single cell burns before going out and freeing its VFX slot.")]
@@ -62,36 +59,33 @@ public class WildfireManager : MonoBehaviour
 
     [Header("Damage")]
     [Tooltip("Damage stops entirely beyond this distance from the nearest burning cell.")]
-    [SerializeField] float damageRadius = 6f;
+    [SerializeField] float damageRadius = 9f;
 
     [Tooltip("Health lost per second when standing in the middle of a fire. Health runs 0-1.")]
     [SerializeField] float maxDamagePerSecond = 0.2f;
 
-    [Header("Buildings")]
-    [Tooltip("The front ignites a building once it comes this close to it.")]
-    [SerializeField] float buildingIgniteRadius = 8f;
-
-    [Tooltip("Seconds a building burns before it collapses.")]
-    [SerializeField] float buildingBurnSeconds = 10f;
-
     [Header("VFX")]
     [SerializeField] FireInstance groundFirePrefab;
-    [SerializeField] FireInstance buildingFirePrefab;
 
     [Tooltip("Hard ceiling on simultaneous ground-fire instances. This is the memory ceiling.")]
-    [SerializeField] int maxConcurrentVfx = 20;
+    [SerializeField] int maxConcurrentVfx = 14;
 
     [Tooltip("Burning cells further than this from the camera are simulated but not drawn.")]
-    [SerializeField] float vfxVisualRange = 55f;
+    [SerializeField] float vfxVisualRange = 70f;
 
     [Tooltip("Particle buffer cap applied to every child system. The prefabs ship at 1000.")]
-    [SerializeField] int maxParticlesPerSystem = 50;
+    [SerializeField] int maxParticlesPerSystem = 90;
 
     [Tooltip("How many of the nearest fires carry a real-time point light.")]
     [SerializeField] int litFireCount = 2;
 
-    [Tooltip("Turn off heat-distortion children. Needed if running an RP asset without Require Opaque Texture.")]
-    [SerializeField] bool disableDistortion = false;
+    [Tooltip("How much bigger than the source prefab each fire is. The pack's fires are campfire-sized.")]
+    [SerializeField] float fireScale = 4f;
+
+    [Tooltip("Turn off heat-distortion children. ON by default: distortion forces a full scene-colour " +
+             "copy and, multiplied across many large overlapping fires, is the single biggest frame cost here. " +
+             "It is also broken on RP assets without Require Opaque Texture (Mobile_RPAsset).")]
+    [SerializeField] bool disableDistortion = true;
 
     [Header("Audio")]
     [Tooltip("One shared looping fire bed, volume driven by distance to the nearest fire.")]
@@ -100,6 +94,7 @@ public class WildfireManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] PlayerController playerController;
+    [SerializeField] DamageTint damageTint;
     [SerializeField] Terrain terrain;
 
     [Tooltip("Leave empty to find every Shelter under /Scene. Cells inside these never ignite.")]
@@ -108,15 +103,11 @@ public class WildfireManager : MonoBehaviour
     [Tooltip("Metres of clearance kept around each shelter.")]
     [SerializeField] float shelterMargin = 2f;
 
-    [Tooltip("Leave empty to burn every BuildingCollapse in the scene.")]
-    [SerializeField] BuildingCollapse[] buildings;
-
     [Header("Constants")]
     [Tooltip("Seconds between simulation ticks. The whole sim runs here, not in Update.")]
     [SerializeField] float tickInterval = 0.25f;
 
     private readonly List<FireCell> cells = new List<FireCell>();
-    private readonly List<BurningBuilding> burningBuildings = new List<BurningBuilding>();
     private readonly List<FireCell> visibleBurning = new List<FireCell>();
     private readonly List<Bounds> shelterBounds = new List<Bounds>();
 
@@ -129,7 +120,11 @@ public class WildfireManager : MonoBehaviour
     private float frontRadius;
     private float lastIgnitionElapsed;
     private int activeVfxCount;
+    private int burningCount;
+    private int burntCount;
+    private float nearestBurningToPlayer = float.MaxValue;
     private bool triggered;
+    private bool prepared;
     private Transform viewer;
 
     // --- stats, used by the CLI verification pass ---
@@ -142,9 +137,10 @@ public class WildfireManager : MonoBehaviour
     public int MaxConcurrentVfx => maxConcurrentVfx;
     public float VfxVisualRange => vfxVisualRange;
 
-    public int BurningCount => CountState(CellState.Burning);
-    public int BurntCount => CountState(CellState.Burnt);
-    public int UnburntCount => CountState(CellState.Unburnt);
+    // Running counters: these are read every tick, so scanning all cells for them was wasteful.
+    public int BurningCount => burningCount;
+    public int BurntCount => burntCount;
+    public int UnburntCount => cells.Count - burningCount - burntCount;
 
     /// <summary>Burning cells too far from the camera to be drawn. Proves sim and view are separate.</summary>
     public int BurningWithoutVfx
@@ -158,21 +154,10 @@ public class WildfireManager : MonoBehaviour
         }
     }
 
-    private int CountState(CellState state)
-    {
-        int n = 0;
-        foreach (var c in cells)
-            if (c.state == state) n++;
-        return n;
-    }
-
     void Awake()
     {
         if (terrain == null)
             terrain = FindFirstObjectByType<Terrain>();
-
-        if (buildings == null || buildings.Length == 0)
-            buildings = FindObjectsByType<BuildingCollapse>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         if (shelters == null || shelters.Length == 0)
             shelters = FindShelters();
@@ -192,6 +177,39 @@ public class WildfireManager : MonoBehaviour
         return found.ToArray();
     }
 
+    /// <summary>
+    /// Build the grid and pre-instantiate every fire up front. Called by DisasterManager as soon
+    /// as Wildfire is drawn, so the whole cost lands during the prep countdown instead of as a
+    /// stall at the moment the fire ignites.
+    /// </summary>
+    public void Prepare()
+    {
+        if (prepared)
+            return;
+
+        prepared = true;
+        CacheShelterBounds();
+        BuildGrid();
+        CreatePool();
+        StartCoroutine(PrewarmPool());
+    }
+
+    /// <summary>Instantiate the pool a few per frame so the prep phase doesn't hitch either.</summary>
+    private IEnumerator PrewarmPool()
+    {
+        var warmed = new List<FireInstance>(maxConcurrentVfx);
+
+        for (int i = 0; i < maxConcurrentVfx; i++)
+        {
+            warmed.Add(pool.Get());
+            if (i % 3 == 2)
+                yield return null;
+        }
+
+        foreach (var instance in warmed)
+            pool.Release(instance);
+    }
+
     /// <summary>Start the wildfire and spread it across <paramref name="runDuration"/> seconds.</summary>
     public void TriggerWildfire(float runDuration)
     {
@@ -202,9 +220,7 @@ public class WildfireManager : MonoBehaviour
         duration = runDuration;
         startTime = Time.time;
 
-        CacheShelterBounds();
-        BuildGrid();
-        CreatePool();
+        Prepare();
         ChooseOrigin();
 
         if (fireAmbience != null)
@@ -343,7 +359,7 @@ public class WildfireManager : MonoBehaviour
             Tick();
 
             bool windowClosed = Time.time - startTime > duration;
-            if (windowClosed && BurningCount == 0 && burningBuildings.Count == 0)
+            if (windowClosed && BurningCount == 0)
                 break;
 
             yield return wait;
@@ -371,18 +387,20 @@ public class WildfireManager : MonoBehaviour
                 {
                     c.state = CellState.Burning;
                     c.ignitedAt = Time.time;
+                    burningCount++;
                     lastIgnitionElapsed = elapsed;
                 }
             }
             else if (c.state == CellState.Burning && Time.time - c.ignitedAt >= cellBurnSeconds)
             {
                 c.state = CellState.Burnt;
+                burningCount--;
+                burntCount++;
                 ReleaseVfx(c);
             }
         }
 
-        UpdateVfx();
-        UpdateBuildings(stillSpreading);
+        UpdateVfx();               // also caches nearestBurningToPlayer for the two calls below
         ApplyDamage();
         UpdateAmbience();
     }
@@ -401,11 +419,18 @@ public class WildfireManager : MonoBehaviour
                     : transform.position;
 
         visibleBurning.Clear();
+        nearestBurningToPlayer = float.MaxValue;
+        Vector3 playerPos = playerController != null ? playerController.transform.position : eye;
 
         foreach (var c in cells)
         {
             if (c.state != CellState.Burning)
                 continue;
+
+            // Folded in here so damage and audio don't each re-scan every cell.
+            float toPlayer = Vector3.Distance(c.position, playerPos);
+            if (toPlayer < nearestBurningToPlayer)
+                nearestBurningToPlayer = toPlayer;
 
             if (Vector3.Distance(c.position, eye) > vfxVisualRange)
                 ReleaseVfx(c);        // out of sight: give the slot back
@@ -424,6 +449,7 @@ public class WildfireManager : MonoBehaviour
             {
                 c.vfx = pool.Get();
                 c.vfx.transform.position = c.position;
+                c.vfx.SetScale(fireScale);
                 c.vfx.Play();
                 activeVfxCount++;
             }
@@ -448,87 +474,6 @@ public class WildfireManager : MonoBehaviour
     {
         foreach (var c in cells)
             ReleaseVfx(c);
-
-        foreach (var b in burningBuildings)
-            if (b.vfx != null) Destroy(b.vfx.gameObject);
-
-        burningBuildings.Clear();
-    }
-
-    private void UpdateBuildings(bool stillSpreading)
-    {
-        if (stillSpreading)
-        {
-            foreach (var building in buildings)
-            {
-                if (building == null || building.HasCollapsed || IsBurning(building))
-                    continue;
-
-                float d = Vector2.Distance(
-                    new Vector2(building.transform.position.x, building.transform.position.z),
-                    new Vector2(origin.x, origin.z));
-
-                if (d - buildingIgniteRadius > frontRadius)
-                    continue;
-
-                var entry = new BurningBuilding { building = building, ignitedAt = Time.time };
-
-                if (buildingFirePrefab != null)
-                {
-                    var renderer = building.GetComponent<Renderer>();
-                    var at = renderer != null ? renderer.bounds.center : building.transform.position;
-                    entry.vfx = Instantiate(buildingFirePrefab, at, Quaternion.identity, transform);
-                    entry.vfx.Tame(maxParticlesPerSystem, disableDistortion);
-                    entry.vfx.Play();
-                }
-
-                burningBuildings.Add(entry);
-            }
-        }
-
-        // Burnt-through buildings come down via the existing fracture path.
-        for (int i = burningBuildings.Count - 1; i >= 0; i--)
-        {
-            var entry = burningBuildings[i];
-            if (Time.time - entry.ignitedAt < buildingBurnSeconds)
-                continue;
-
-            if (entry.vfx != null)
-                Destroy(entry.vfx.gameObject);
-
-            if (entry.building != null)
-                entry.building.Collapse();
-
-            burningBuildings.RemoveAt(i);
-        }
-    }
-
-    private bool IsBurning(BuildingCollapse building)
-    {
-        foreach (var b in burningBuildings)
-            if (b.building == building) return true;
-
-        return false;
-    }
-
-    private float NearestBurningDistance()
-    {
-        if (playerController == null)
-            return float.MaxValue;
-
-        var p = playerController.transform.position;
-        float nearest = float.MaxValue;
-
-        foreach (var c in cells)
-        {
-            if (c.state != CellState.Burning)
-                continue;
-
-            float d = Vector3.Distance(c.position, p);
-            if (d < nearest) nearest = d;
-        }
-
-        return nearest;
     }
 
     /// <summary>
@@ -540,12 +485,21 @@ public class WildfireManager : MonoBehaviour
         if (playerController == null || IsPlayerSheltered())
             return;
 
-        float d = NearestBurningDistance();
+        float d = nearestBurningToPlayer;
         if (d >= damageRadius)
             return;
 
         float intensity = 1f - (d / damageRadius);
         playerController.TakeDamage(maxDamagePerSecond * intensity * tickInterval);
+
+        // Sustained red wash that deepens as the fire closes in, plus a flash on every tick of damage.
+        if (damageTint != null)
+        {
+            damageTint.SetSustained(intensity);
+            // Floor the flash so even a distant graze registers as a clear hit, rather than
+            // scaling to near-invisible at the edge of the radius.
+            damageTint.Flash(Mathf.Lerp(0.6f, 1f, intensity));
+        }
     }
 
     private void UpdateAmbience()
@@ -553,7 +507,7 @@ public class WildfireManager : MonoBehaviour
         if (fireAmbience == null)
             return;
 
-        float d = NearestBurningDistance();
+        float d = nearestBurningToPlayer;
         fireAmbience.volume = d >= ambienceFalloffDistance
             ? 0f
             : 1f - (d / ambienceFalloffDistance);

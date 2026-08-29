@@ -66,6 +66,11 @@ public class DisasterManager : MonoBehaviour
         if (surviveGroup != null)
             surviveGroup.SetActive(false);
 
+        // Build the wildfire's grid and pre-instantiate its VFX now, during the countdown,
+        // so ignition doesn't stall the frame it happens on.
+        if (chosenDisaster == DisasterType.Wildfire && wildfire != null)
+            wildfire.Prepare();
+
         if (disasterText != null)
             disasterText.text = chosenDisaster + " in";
 
