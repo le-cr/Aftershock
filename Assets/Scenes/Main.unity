@@ -18173,10 +18173,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfa95c5b8f6ed43f783542688003d5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisasterManager
-  warningSeconds: 30
+  warningSeconds: 5
   surviveSeconds: 120
-  overrideRandomPick: 0
-  forcedDisaster: 0
+  overrideRandomPick: 1
+  forcedDisaster: 2
   disasterGroup: {fileID: 1067583971}
   disasterText: {fileID: 885519195}
   disasterTimer: {fileID: 1828585454}
