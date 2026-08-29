@@ -1,39 +1,56 @@
 using UnityEngine;
-using System.Collections.Generic;
 
+/// <summary>
+/// Drives the blizzard hazard. Snow particles physically collide with the world
+/// (so a shelter roof actually blocks them), and the player takes damage only while
+/// snow is still landing on them — step under cover and the exposure lapses.
+/// </summary>
+[RequireComponent(typeof(ParticleSystem))]
 public class BlizzardManager : MonoBehaviour
 {
-    private ParticleSystem ps;
-    private List<ParticleSystem.Particle> enterParticles = new List<ParticleSystem.Particle>();
+    [Header("Constants")]
+    [Tooltip("How long the player stays 'in the snow' after the last particle hit. " +
+             "Acts as a grace period so stepping under a roof clears exposure.")]
+    [SerializeField] float exposureGraceSeconds = 0.5f;
 
+    [Header("References")]
     [SerializeField] PlayerController playerController;
 
-    void Start()
+    private ParticleSystem ps;
+    private float lastSnowHitTime = float.NegativeInfinity;
+
+    void Awake()
     {
         ps = GetComponent<ParticleSystem>();
     }
 
-    private void OnParticleTrigger()
+    void OnDisable()
     {
-        // 1. Get all particles that just entered a trigger zone
-        int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enterParticles);
+        // The blizzard is over (or never started) — never leave the player stuck taking damage.
+        lastSnowHitTime = float.NegativeInfinity;
+        if (playerController != null)
+            playerController.touchingSnow = false;
+    }
 
-        // 2. Loop through each particle that made contact
-        for (int i = 0; i < numEnter; i++)
-        {
-            ParticleSystem.Particle p = enterParticles[i];
+    void Update()
+    {
+        if (playerController == null)
+            return;
 
-            // 3. Get the specific Collider component the particle hit
-            Component triggerComponent = ps.trigger.GetCollider(0); 
-            
-            if (triggerComponent != null)
-            {
-                GameObject hitObject = triggerComponent.gameObject;
-                if (hitObject.CompareTag("Player"))
-                {
-                    playerController.touchingSnow = true;
-                }
-            }
-        }
+        playerController.touchingSnow = Time.time - lastSnowHitTime < exposureGraceSeconds;
+    }
+
+    /// <summary>
+    /// Sent by the collision module (Send Collision Messages) with the GameObject that was hit.
+    /// Unlike the trigger module this identifies the actual collider, so it can't confuse the
+    /// player with terrain the way indexing into the trigger collider list did.
+    /// </summary>
+    private void OnParticleCollision(GameObject other)
+    {
+        // The hit may land on the Player root (CharacterController) or the Capsule child.
+        if (other.GetComponentInParent<PlayerController>() == null)
+            return;
+
+        lastSnowHitTime = Time.time;
     }
 }

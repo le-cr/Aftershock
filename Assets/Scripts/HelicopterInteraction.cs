@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Lets the player walk up to the helicopter and press F to enter/exit it,
+/// Lets the player walk up to the helicopter and press H to enter/exit it,
 /// switching the active camera/audio listener and gating helicopter input
 /// to only respond while the player is aboard.
 /// </summary>
@@ -46,7 +46,7 @@ public class HelicopterInteraction : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
-        if (Keyboard.current.fKey.wasPressedThisFrame)
+        if (Keyboard.current.hKey.wasPressedThisFrame)
         {
             if (!isPiloting && playerInRange)
                 EnterHelicopter();

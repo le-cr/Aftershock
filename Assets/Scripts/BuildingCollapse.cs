@@ -39,6 +39,16 @@ public class BuildingCollapse : MonoBehaviour
     [Tooltip("Angular damping on the fragments.")]
     public float fragmentAngularDrag = 1.5f;
 
+    [Header("Damage")]
+    [Tooltip("Health removed when a fragment strikes the player. Health runs 0-1.")]
+    public float debrisDamage = 0.08f;
+
+    [Tooltip("Minimum impact speed before a fragment hurts. Stops resting rubble from grinding the player down.")]
+    public float debrisMinImpactSpeed = 2.5f;
+
+    [Tooltip("Seconds before the same fragment can hurt the player again.")]
+    public float debrisRearmSeconds = 0.5f;
+
     [Header("Cleanup")]
     [Tooltip("Destroy the rubble after it has settled.")]
     public bool despawnFragments = false;
@@ -113,6 +123,11 @@ public class BuildingCollapse : MonoBehaviour
             body.linearDamping = fragmentDrag;
             body.angularDamping = fragmentAngularDrag;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+
+            // Flying debris hurts. Attached here because this is where the fragment bodies
+            // are first handled; they are created at runtime by the fracture.
+            body.gameObject.AddComponent<DebrisDamage>()
+                .Configure(debrisDamage, debrisMinImpactSpeed, debrisRearmSeconds);
 
             body.AddExplosionForce(
                 explosionForce,

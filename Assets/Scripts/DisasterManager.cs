@@ -6,8 +6,7 @@ using TMPro;
 /// the warning, then fires the disaster the HUD named and starts the survival timer.
 ///
 /// The HUD text is the single source of truth — whatever <see cref="disasterText"/>
-/// says is what actually happens. Earthquake is deliberately absent from
-/// <see cref="DisasterType"/> until its collapse behaviour is fixed.
+/// says is what actually happens.
 /// </summary>
 public class DisasterManager : MonoBehaviour
 {
@@ -15,7 +14,7 @@ public class DisasterManager : MonoBehaviour
     {
         Flood,
         Blizzard,
-        // Earthquake — re-add once BuildingCollapse works.
+        Earthquake,
     }
 
     [Header("Constants")]
@@ -39,6 +38,7 @@ public class DisasterManager : MonoBehaviour
     [Header("Disasters")]
     [SerializeField] Flood flood;
     [SerializeField] GameObject blizzard;
+    [SerializeField] EarthquakeManager earthquake;
 
     [Header("References")]
     [SerializeField] PlayerController playerController;
@@ -91,6 +91,11 @@ public class DisasterManager : MonoBehaviour
             case DisasterType.Blizzard:
                 if (blizzard != null)
                     blizzard.SetActive(true);
+                break;
+
+            case DisasterType.Earthquake:
+                if (earthquake != null)
+                    earthquake.TriggerEarthquake();
                 break;
         }
 
