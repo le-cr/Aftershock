@@ -1,5 +1,7 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,14 +15,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] HealthBar healthBar;
+    [SerializeField] GameObject deathScreen;
 
     private float timeSinceDamage = 0f;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -33,5 +30,24 @@ public class PlayerController : MonoBehaviour
                 timeSinceDamage = 0f;
             }
         }
+    }
+
+    public void Respawn()
+    {
+        deathScreen.SetActive(false);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex);
+    }
+
+    public void Die()
+    {
+        deathScreen.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void Win()
+    {
+        
     }
 }

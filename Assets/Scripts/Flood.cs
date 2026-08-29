@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Flood : MonoBehaviour
 {
@@ -13,10 +12,17 @@ public class Flood : MonoBehaviour
 
     private bool isFlooding;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public bool IsFlooding => isFlooding;
+
+    /// <summary>Start raising the water. Called by DisasterManager when Flood is the chosen disaster.</summary>
+    public void BeginFlood()
     {
-        
+        isFlooding = true;
+    }
+
+    public void StopFlood()
+    {
+        isFlooding = false;
     }
 
     // Update is called once per frame
@@ -25,10 +31,6 @@ public class Flood : MonoBehaviour
         if (transform.position.y >= maxFloodHeight)
         {
             isFlooding = false;
-        }
-        if (Keyboard.current.fKey.isPressed)
-        {
-            isFlooding = true;
         }
         if (isFlooding)
         {
