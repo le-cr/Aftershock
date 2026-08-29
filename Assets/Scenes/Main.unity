@@ -15947,11 +15947,6 @@ MonoBehaviour:
   minOriginDistanceFromPlayer: 8
   damageRadius: 9
   maxDamagePerSecond: 0.2
-  buildingIgniteRadius: 10
-  buildingBurnSeconds: 10
-  buildingFirePrefab: {fileID: 761814943410123144, guid: 244b1cc8940bd0844a05812855fbe45d, type: 3}
-  buildingFireScale: 6
-  buildings: []
   groundFirePrefab: {fileID: -548408306122104794, guid: 858e79faf6de940498a11b25374053d0, type: 3}
   maxConcurrentVfx: 10
   vfxVisualRange: 70
@@ -18445,10 +18440,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfa95c5b8f6ed43f783542688003d5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisasterManager
-  warningSeconds: 30
+  warningSeconds: 10
   surviveSeconds: 120
   overrideRandomPick: 0
-  forcedDisaster: 0
+  forcedDisaster: 3
   disasterGroup: {fileID: 1067583971}
   disasterText: {fileID: 885519195}
   disasterTimer: {fileID: 1828585454}
