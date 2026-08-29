@@ -15395,8 +15395,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   shakeDuration: 8
   shakeMagnitude: 0.35
-  collapseStagger: 0.45
   leadIn: 0.6
+  initialCollapseCount: 2
+  minInterval: 15
+  maxInterval: 30
+  defaultDuration: 120
+  aftershockShakeDuration: 4
+  aftershockMagnitudeScale: 0.6
+  aftershockCollapseCount: 1
+  collapseStagger: 0.45
   buildings: []
   cameraShakes: []
 --- !u!4 &1241029358
@@ -15710,6 +15717,174 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1304141135}
   m_Mesh: {fileID: 4300078, guid: f55006f6a32a71b45a114b4680c1e575, type: 3}
+--- !u!1 &1339675626
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1339675629}
+  - component: {fileID: 1339675628}
+  - component: {fileID: 1339675627}
+  m_Layer: 0
+  m_Name: WildfireManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &1339675627
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339675626}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: af0e33a1b1f847f4f80e106592282d96, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1339675628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339675626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eed442e35ea0249e1850d0206f5a332a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WildfireManager
+  areaCenter: {x: -19, y: 0, z: 18}
+  areaSize: {x: 104, y: 88}
+  cellSpacing: 10
+  cellBurnSeconds: 14
+  spreadCompletionFraction: 0.9
+  ignitionJitter: 4
+  minOriginDistanceFromPlayer: 8
+  damageRadius: 6
+  maxDamagePerSecond: 0.2
+  buildingIgniteRadius: 8
+  buildingBurnSeconds: 10
+  groundFirePrefab: {fileID: -548408306122104794, guid: 858e79faf6de940498a11b25374053d0, type: 3}
+  buildingFirePrefab: {fileID: -3513924557965776816, guid: 86cf272c329017647a3b0c6c6edcff58, type: 3}
+  maxConcurrentVfx: 20
+  vfxVisualRange: 55
+  maxParticlesPerSystem: 50
+  litFireCount: 2
+  disableDistortion: 0
+  fireAmbience: {fileID: 1339675627}
+  ambienceFalloffDistance: 30
+  playerController: {fileID: 1301065030}
+  terrain: {fileID: 1473298224}
+  shelters: []
+  shelterMargin: 2
+  buildings: []
+  tickInterval: 0.25
+--- !u!4 &1339675629
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339675626}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1348846456
 GameObject:
   m_ObjectHideFlags: 0
@@ -18173,10 +18348,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfa95c5b8f6ed43f783542688003d5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisasterManager
-  warningSeconds: 5
+  warningSeconds: 30
   surviveSeconds: 120
-  overrideRandomPick: 1
-  forcedDisaster: 2
+  overrideRandomPick: 0
+  forcedDisaster: 0
   disasterGroup: {fileID: 1067583971}
   disasterText: {fileID: 885519195}
   disasterTimer: {fileID: 1828585454}
@@ -18185,6 +18360,7 @@ MonoBehaviour:
   flood: {fileID: 1912205514}
   blizzard: {fileID: 1868174454}
   earthquake: {fileID: 1241029357}
+  wildfire: {fileID: 1339675628}
   playerController: {fileID: 1301065030}
 --- !u!4 &1642481535
 Transform:
@@ -23705,3 +23881,4 @@ SceneRoots:
   - {fileID: 699438416}
   - {fileID: 1241029358}
   - {fileID: 1642481535}
+  - {fileID: 1339675629}

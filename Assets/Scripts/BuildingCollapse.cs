@@ -58,6 +58,9 @@ public class BuildingCollapse : MonoBehaviour
 
     bool collapsed;
 
+    /// <summary>True once this building has been fractured, so a manager can skip it.</summary>
+    public bool HasCollapsed => collapsed;
+
     void Update()
     {
         if (!collapsed && Input.GetKeyDown(collapseKey))

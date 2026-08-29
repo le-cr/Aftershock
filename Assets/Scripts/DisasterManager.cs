@@ -15,6 +15,7 @@ public class DisasterManager : MonoBehaviour
         Flood,
         Blizzard,
         Earthquake,
+        Wildfire,
     }
 
     [Header("Constants")]
@@ -39,6 +40,7 @@ public class DisasterManager : MonoBehaviour
     [SerializeField] Flood flood;
     [SerializeField] GameObject blizzard;
     [SerializeField] EarthquakeManager earthquake;
+    [SerializeField] WildfireManager wildfire;
 
     [Header("References")]
     [SerializeField] PlayerController playerController;
@@ -94,8 +96,15 @@ public class DisasterManager : MonoBehaviour
                 break;
 
             case DisasterType.Earthquake:
+                // Tremors continue for the whole survival window.
                 if (earthquake != null)
-                    earthquake.TriggerEarthquake();
+                    earthquake.TriggerEarthquake(surviveSeconds);
+                break;
+
+            case DisasterType.Wildfire:
+                // The front is paced to cover the map across the survival window.
+                if (wildfire != null)
+                    wildfire.TriggerWildfire(surviveSeconds);
                 break;
         }
 
