@@ -18442,7 +18442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DisasterManager
   warningSeconds: 10
   surviveSeconds: 120
-  overrideRandomPick: 0
+  overrideRandomPick: 1
   forcedDisaster: 3
   disasterGroup: {fileID: 1067583971}
   disasterText: {fileID: 885519195}
