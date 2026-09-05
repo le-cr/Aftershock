@@ -5,10 +5,11 @@ using UnityEngine.Pool;
 
 /// <summary>
 /// Runs the wildfire: ignites beside the player and spreads outward as an advancing front for
-/// the whole survival window.
+/// the whole survival window, setting buildings alight as it passes them.
 ///
-/// Buildings are deliberately NOT set alight here: fracturing them mid-wildfire crashed the game.
-/// Building collapse belongs to EarthquakeManager alone.
+/// Burning buildings are purely visual: the fire on them burns for a while and then goes out.
+/// They are deliberately NOT fractured here: collapsing them mid-wildfire crashed the game, so
+/// building collapse belongs to EarthquakeManager alone.
 ///
 /// The simulation and the visuals are deliberately separate. Spread is a lightweight logical
 /// grid of cells; the fire VFX are a small pooled set attached only to burning cells near the
@@ -31,6 +32,12 @@ public class WildfireManager : MonoBehaviour
         public FireInstance vfx;
     }
 
+    class BurningBuilding
+    {
+        public BuildingCollapse building;
+        public float ignitedAt;
+        public FireInstance vfx;
+    }
 
     [Header("Area")]
     [Tooltip("Centre of the burnable area, in world space.")]
@@ -64,8 +71,25 @@ public class WildfireManager : MonoBehaviour
     [Tooltip("Health lost per second when standing in the middle of a fire. Health runs 0-1.")]
     [SerializeField] float maxDamagePerSecond = 0.2f;
 
+    [Header("Buildings")]
+    [Tooltip("The front ignites a building once it comes this close to it.")]
+    [SerializeField] float buildingIgniteRadius = 10f;
+
+    [Tooltip("Seconds a building burns before its fire goes out. The building itself is untouched.")]
+    [SerializeField] float buildingBurnSeconds = 20f;
+
+    [Tooltip("Hard ceiling on buildings alight at once. Buildings the front reaches while full wait their turn.")]
+    [SerializeField] int maxConcurrentBuildingFires = 4;
+
+    [Tooltip("Leave empty to burn every BuildingCollapse in the scene.")]
+    [SerializeField] BuildingCollapse[] buildings;
+
     [Header("VFX")]
     [SerializeField] FireInstance groundFirePrefab;
+    [SerializeField] FireInstance buildingFirePrefab;
+
+    [Tooltip("How much bigger than the source prefab each building fire is.")]
+    [SerializeField] float buildingFireScale = 6f;
 
     [Tooltip("Hard ceiling on simultaneous ground-fire instances. This is the memory ceiling.")]
     [SerializeField] int maxConcurrentVfx = 14;
@@ -108,6 +132,8 @@ public class WildfireManager : MonoBehaviour
     [SerializeField] float tickInterval = 0.25f;
 
     private readonly List<FireCell> cells = new List<FireCell>();
+    private readonly List<BurningBuilding> burningBuildings = new List<BurningBuilding>();
+    private readonly HashSet<BuildingCollapse> ignitedBuildings = new HashSet<BuildingCollapse>();
     private readonly List<FireCell> visibleBurning = new List<FireCell>();
     private readonly List<Bounds> shelterBounds = new List<Bounds>();
 
@@ -139,6 +165,7 @@ public class WildfireManager : MonoBehaviour
 
     // Running counters: these are read every tick, so scanning all cells for them was wasteful.
     public int BurningCount => burningCount;
+    public int BurningBuildingCount => burningBuildings.Count;
     public int BurntCount => burntCount;
     public int UnburntCount => cells.Count - burningCount - burntCount;
 
@@ -158,6 +185,9 @@ public class WildfireManager : MonoBehaviour
     {
         if (terrain == null)
             terrain = FindFirstObjectByType<Terrain>();
+
+        if (buildings == null || buildings.Length == 0)
+            buildings = FindObjectsByType<BuildingCollapse>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         if (shelters == null || shelters.Length == 0)
             shelters = FindShelters();
@@ -359,7 +389,7 @@ public class WildfireManager : MonoBehaviour
             Tick();
 
             bool windowClosed = Time.time - startTime > duration;
-            if (windowClosed && BurningCount == 0)
+            if (windowClosed && BurningCount == 0 && burningBuildings.Count == 0)
                 break;
 
             yield return wait;
@@ -401,6 +431,7 @@ public class WildfireManager : MonoBehaviour
         }
 
         UpdateVfx();               // also caches nearestBurningToPlayer for the two calls below
+        UpdateBuildings(stillSpreading);
         ApplyDamage();
         UpdateAmbience();
     }
@@ -474,6 +505,60 @@ public class WildfireManager : MonoBehaviour
     {
         foreach (var c in cells)
             ReleaseVfx(c);
+
+        foreach (var b in burningBuildings)
+            if (b.vfx != null) Destroy(b.vfx.gameObject);
+
+        burningBuildings.Clear();
+    }
+
+    /// <summary>
+    /// Set buildings alight as the front reaches them, and put the fire out once they have burnt
+    /// for long enough. Visual only: the building is never fractured from here.
+    /// </summary>
+    private void UpdateBuildings(bool stillSpreading)
+    {
+        if (stillSpreading && buildingFirePrefab != null)
+        {
+            foreach (var building in buildings)
+            {
+                if (burningBuildings.Count >= maxConcurrentBuildingFires)
+                    break;
+
+                if (building == null || building.HasCollapsed || ignitedBuildings.Contains(building))
+                    continue;
+
+                float d = Vector2.Distance(
+                    new Vector2(building.transform.position.x, building.transform.position.z),
+                    new Vector2(origin.x, origin.z));
+
+                if (d - buildingIgniteRadius > frontRadius)
+                    continue;
+
+                var renderer = building.GetComponent<Renderer>();
+                var at = renderer != null ? renderer.bounds.center : building.transform.position;
+
+                var vfx = Instantiate(buildingFirePrefab, at, Quaternion.identity, transform);
+                vfx.Tame(maxParticlesPerSystem, disableDistortion);
+                vfx.SetScale(buildingFireScale);
+                vfx.Play();
+
+                ignitedBuildings.Add(building);
+                burningBuildings.Add(new BurningBuilding { building = building, ignitedAt = Time.time, vfx = vfx });
+            }
+        }
+
+        for (int i = burningBuildings.Count - 1; i >= 0; i--)
+        {
+            var entry = burningBuildings[i];
+            if (Time.time - entry.ignitedAt < buildingBurnSeconds)
+                continue;
+
+            if (entry.vfx != null)
+                Destroy(entry.vfx.gameObject);
+
+            burningBuildings.RemoveAt(i);
+        }
     }
 
     /// <summary>
