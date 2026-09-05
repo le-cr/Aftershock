@@ -64,6 +64,27 @@ public class WildfireManager : MonoBehaviour
     [Tooltip("Fire ignites at least this far from the player, so it starts beside them not on them.")]
     [SerializeField] float minOriginDistanceFromPlayer = 8f;
 
+    [Header("Wind")]
+    [Tooltip("How strongly wind stretches the front downwind. 0 = a circle, 0.5 = downwind cells ignite " +
+             "at half the distance upwind cells do.")]
+    [Range(0f, 0.8f)]
+    [SerializeField] float windBias = 0.45f;
+
+    [Tooltip("Degrees per second the wind heading can drift over the fire.")]
+    [SerializeField] float windDriftDegreesPerSecond = 2f;
+
+    [Header("Aftermath")]
+    [Tooltip("Particle material for embers drifting past the player. Leave empty for none.")]
+    [SerializeField] Material emberMaterial;
+
+    [Tooltip("Embers per second when standing right next to the fire.")]
+    [SerializeField] float emberRateNearFire = 40f;
+
+    [Tooltip("Leave a dark scorch on the ground where a cell has burnt out.")]
+    [SerializeField] bool leaveScorchMarks = true;
+
+    [SerializeField] Color scorchColor = new Color(0.05f, 0.04f, 0.03f, 0.75f);
+
     [Header("Damage")]
     [Tooltip("Damage stops entirely beyond this distance from the nearest burning cell.")]
     [SerializeField] float damageRadius = 9f;
@@ -120,6 +141,7 @@ public class WildfireManager : MonoBehaviour
     [SerializeField] PlayerController playerController;
     [SerializeField] DamageTint damageTint;
     [SerializeField] Terrain terrain;
+    [SerializeField] DisasterAtmosphere atmosphere;
 
     [Tooltip("Leave empty to find every Shelter under /Scene. Cells inside these never ignite.")]
     [SerializeField] Transform[] shelters;
@@ -152,6 +174,13 @@ public class WildfireManager : MonoBehaviour
     private bool triggered;
     private bool prepared;
     private Transform viewer;
+    private Vector3 windDir;
+    private ParticleSystem embers;
+    private Material scorchMaterial;
+    private Mesh scorchMesh;
+    private Transform scorchRoot;
+
+    public Vector3 WindDirection => windDir;
 
     // --- stats, used by the CLI verification pass ---
     public bool HasTriggered => triggered;
@@ -191,6 +220,11 @@ public class WildfireManager : MonoBehaviour
 
         if (shelters == null || shelters.Length == 0)
             shelters = FindShelters();
+
+        if (atmosphere == null)
+            atmosphere = FindFirstObjectByType<DisasterAtmosphere>();
+
+        windDir = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f) * Vector3.forward;
     }
 
     private Transform[] FindShelters()
@@ -252,6 +286,17 @@ public class WildfireManager : MonoBehaviour
 
         Prepare();
         ChooseOrigin();
+
+        if (emberMaterial != null && embers == null)
+            embers = ParticleFactory.Embers(transform, emberMaterial);
+
+        if (leaveScorchMarks && scorchRoot == null)
+        {
+            scorchRoot = new GameObject("Scorch").transform;
+            scorchRoot.SetParent(transform, false);
+            scorchMesh = BuildScorchMesh();
+            scorchMaterial = BuildScorchMaterial();
+        }
 
         if (fireAmbience != null)
         {
@@ -373,11 +418,26 @@ public class WildfireManager : MonoBehaviour
         maxCellDistance = 0.01f;
         foreach (var c in cells)
         {
-            c.distanceToOrigin = Vector2.Distance(new Vector2(c.position.x, c.position.z), new Vector2(origin.x, origin.z)) + c.jitter;
+            c.distanceToOrigin = WindDistance(c.position) + c.jitter;
             if (c.distanceToOrigin > maxCellDistance) maxCellDistance = c.distanceToOrigin;
         }
 
         spreadSpeed = maxCellDistance / Mathf.Max(duration * spreadCompletionFraction, 0.01f);
+    }
+
+    /// <summary>
+    /// Distance from the origin as the fire experiences it: shorter downwind, longer upwind, so the
+    /// front is an ellipse stretched along the wind rather than a circle.
+    /// </summary>
+    private float WindDistance(Vector3 p)
+    {
+        var d = new Vector2(p.x - origin.x, p.z - origin.z);
+        float len = d.magnitude;
+        if (len < 0.001f)
+            return 0f;
+
+        float downwind = Vector2.Dot(d / len, new Vector2(windDir.x, windDir.z));   // -1 upwind .. +1 downwind
+        return len * (1f - windBias * downwind);
     }
 
     private IEnumerator Run()
@@ -427,13 +487,106 @@ public class WildfireManager : MonoBehaviour
                 burningCount--;
                 burntCount++;
                 ReleaseVfx(c);
+                PlaceScorch(c);
             }
         }
+
+        // The wind wanders a little; the front's shape was fixed at ignition, but embers and smoke follow it.
+        windDir = Quaternion.Euler(0f, (Mathf.PerlinNoise(Time.time * 0.05f, 7f) - 0.5f) * windDriftDegreesPerSecond * tickInterval * 2f, 0f) * windDir;
 
         UpdateVfx();               // also caches nearestBurningToPlayer for the two calls below
         UpdateBuildings(stillSpreading);
         ApplyDamage();
         UpdateAmbience();
+        UpdateEmbers();
+        UpdateSky();
+    }
+
+    /// <summary>Embers blow past the player, thicker the closer the fire is.</summary>
+    private void UpdateEmbers()
+    {
+        if (embers == null || playerController == null)
+            return;
+
+        var p = playerController.transform.position;
+        embers.transform.position = p;
+
+        float near = Mathf.Clamp01(1f - nearestBurningToPlayer / 40f);
+        ParticleFactory.SetRate(embers, emberRateNearFire * near * near);
+        ParticleFactory.SetWind(embers, windDir * 3f + Vector3.up * 0.8f);
+    }
+
+    /// <summary>Smoke fills the sky in proportion to how much of the map has burnt or is burning.</summary>
+    private void UpdateSky()
+    {
+        if (atmosphere == null || cells.Count == 0)
+            return;
+
+        float smoke = (burntCount + burningCount * 1.5f) / cells.Count;
+        atmosphere.SetIntensity(Mathf.Clamp01(smoke), 8f);
+    }
+
+    private void PlaceScorch(FireCell c)
+    {
+        if (scorchRoot == null)
+            return;
+
+        var go = new GameObject("ScorchMark");
+        go.transform.SetParent(scorchRoot, false);
+        go.transform.position = c.position + Vector3.up * 0.06f;
+        go.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+        go.transform.localScale = Vector3.one * cellSpacing * Random.Range(0.55f, 0.75f);
+
+        var mf = go.AddComponent<MeshFilter>();
+        mf.sharedMesh = scorchMesh;
+        var mr = go.AddComponent<MeshRenderer>();
+        mr.sharedMaterial = scorchMaterial;
+        mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        mr.receiveShadows = false;
+    }
+
+    /// <summary>A soft-edged disc: opaque black centre fading to nothing at the rim, via vertex alpha.</summary>
+    private static Mesh BuildScorchMesh()
+    {
+        const int segments = 18;
+        var verts = new Vector3[segments + 1];
+        var cols = new Color[segments + 1];
+        var tris = new int[segments * 3];
+
+        verts[0] = Vector3.zero;
+        cols[0] = Color.white;
+        for (int i = 0; i < segments; i++)
+        {
+            float a = i / (float)segments * Mathf.PI * 2f;
+            float r = 0.5f * Random.Range(0.8f, 1.1f);        // ragged edge
+            verts[i + 1] = new Vector3(Mathf.Cos(a) * r, 0f, Mathf.Sin(a) * r);
+            cols[i + 1] = new Color(1f, 1f, 1f, 0f);
+            tris[i * 3] = 0;
+            tris[i * 3 + 1] = (i + 1) % segments + 1;
+            tris[i * 3 + 2] = i + 1;
+        }
+
+        var mesh = new Mesh { vertices = verts, colors = cols, triangles = tris };
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+
+    /// <summary>Transparent, vertex-coloured unlit material so the disc fades out at its edge.</summary>
+    private Material BuildScorchMaterial()
+    {
+        var shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+        if (shader == null) shader = Shader.Find("Universal Render Pipeline/Unlit");
+        var mat = new Material(shader);
+        mat.SetColor("_BaseColor", scorchColor);
+        mat.SetFloat("_Surface", 1f);                         // transparent
+        mat.SetFloat("_Blend", 0f);                           // alpha
+        mat.SetFloat("_ZWrite", 0f);
+        mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent - 10;
+        return mat;
     }
 
     /// <summary>

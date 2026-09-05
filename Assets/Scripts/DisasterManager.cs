@@ -44,10 +44,17 @@ public class DisasterManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] PlayerController playerController;
+    [SerializeField] DisasterAtmosphere atmosphere;
 
     private DisasterType chosenDisaster;
 
     public DisasterType ChosenDisaster => chosenDisaster;
+
+    void Awake()
+    {
+        if (atmosphere == null)
+            atmosphere = FindFirstObjectByType<DisasterAtmosphere>();
+    }
 
     void Start()
     {
@@ -71,6 +78,14 @@ public class DisasterManager : MonoBehaviour
         if (chosenDisaster == DisasterType.Wildfire && wildfire != null)
             wildfire.Prepare();
 
+        // First signs: clouds gather, haze builds, the light changes over the countdown.
+        if (atmosphere != null)
+            atmosphere.BeginWarning(chosenDisaster, warningSeconds * 0.8f);
+
+        // The storm itself arrives ahead of the water.
+        if (chosenDisaster == DisasterType.Flood && flood != null)
+            flood.BeginStorm();
+
         if (disasterText != null)
             disasterText.text = chosenDisaster.ToString().ToUpperInvariant() + " in";
 
@@ -88,6 +103,9 @@ public class DisasterManager : MonoBehaviour
     /// <summary>Fire the disaster named in the HUD, then hand over to the survival timer.</summary>
     public void TriggerDisaster()
     {
+        if (atmosphere != null)
+            atmosphere.BeginActive(chosenDisaster, chosenDisaster == DisasterType.Earthquake ? 3f : 10f);
+
         switch (chosenDisaster)
         {
             case DisasterType.Flood:

@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: c56e28e54cac24b04ae3dd957d214534, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 7416536dbe0334cfd888dd1beb75a9fb, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -1468,6 +1468,99 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &111310219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 111310220}
+  - component: {fileID: 111310223}
+  - component: {fileID: 111310222}
+  - component: {fileID: 111310221}
+  m_Layer: 5
+  m_Name: ColdTint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &111310220
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111310219}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 467581391}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0.000061035156, y: 0}
+  m_SizeDelta: {x: -0.000061035, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &111310221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111310219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f095ba21c86cd402fa6fc0143592888c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageTint
+  tintColor: {r: 0.55, g: 0.75, b: 1, a: 1}
+  sustainedAlpha: 0.3
+  flashAlpha: 0
+  flashFadeSpeed: 2.2
+  sustainedFadeSpeed: 0.15
+--- !u!114 &111310222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111310219}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.55, g: 0.75, b: 1, a: 0}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &111310223
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111310219}
+  m_CullTransparentMesh: 1
 --- !u!1 &119574469
 GameObject:
   m_ObjectHideFlags: 0
@@ -5854,6 +5947,7 @@ RectTransform:
   m_Children:
   - {fileID: 982379219}
   - {fileID: 66397384}
+  - {fileID: 111310220}
   - {fileID: 690885140}
   - {fileID: 95275407}
   - {fileID: 845131920}
@@ -8255,6 +8349,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 388173178551520838, guid: f77d76aa994a64f5da06fef6388ac62b, type: 3}
+      propertyPath: terrain
+      value: 
+      objectReference: {fileID: 1473298224}
+    - target: {fileID: 388173178551520838, guid: f77d76aa994a64f5da06fef6388ac62b, type: 3}
+      propertyPath: coldTint
+      value: 
+      objectReference: {fileID: 111310221}
+    - target: {fileID: 388173178551520838, guid: f77d76aa994a64f5da06fef6388ac62b, type: 3}
+      propertyPath: atmosphere
+      value: 
+      objectReference: {fileID: 1642481536}
     - target: {fileID: 388173178551520838, guid: f77d76aa994a64f5da06fef6388ac62b, type: 3}
       propertyPath: playerController
       value: 
@@ -13375,6 +13481,8 @@ MonoBehaviour:
   defaultDuration: 8
   defaultMagnitude: 0.35
   frequency: 14
+  rotationDegreesPerMetre: 9
+  rotationFrequencyScale: 0.45
 --- !u!1 &1117605741
 GameObject:
   m_ObjectHideFlags: 0
@@ -15538,19 +15646,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb13c9689645e4259a281930c7fe92f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  foreshockSeconds: 3
   shakeDuration: 8
   shakeMagnitude: 0.35
   leadIn: 0.6
   initialCollapseCount: 2
-  minInterval: 15
-  maxInterval: 30
+  firstInterval: 12
+  intervalGrowth: 0.3
   defaultDuration: 120
   aftershockShakeDuration: 4
   aftershockMagnitudeScale: 0.6
-  aftershockCollapseCount: 1
+  bigAftershockChance: 0.15
+  collapseThreshold: 0.45
+  stumblePerMetre: 3.5
+  dustRateAtFullShake: 60
+  collapseDustBurst: 90
+  dustMaterial: {fileID: 2100000, guid: 1f96ba7a3c3ef3540b8dda1c860d8409, type: 2}
+  dustColor: {r: 0.62, g: 0.55, b: 0.45, a: 0.28}
   collapseStagger: 0.45
   buildings: []
   cameraShakes: []
+  playerController: {fileID: 0}
+  atmosphere: {fileID: 1642481536}
 --- !u!4 &1241029358
 Transform:
   m_ObjectHideFlags: 0
@@ -15574,6 +15691,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 774497149}
     m_Modifications:
+    - target: {fileID: 5784549240390800084, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: atmosphere
+      value: 
+      objectReference: {fileID: 1642481536}
+    - target: {fileID: 5784549240390800084, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: rainMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: b3406cc425915a34ba2ee9bcef1686f5, type: 2}
     - target: {fileID: 5784549240390800084, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
       propertyPath: waterTintPanel
       value: 
@@ -15780,6 +15905,8 @@ MonoBehaviour:
   defaultDuration: 8
   defaultMagnitude: 0.35
   frequency: 14
+  rotationDegreesPerMetre: 9
+  rotationFrequencyScale: 0.45
 --- !u!1 &1304141135
 GameObject:
   m_ObjectHideFlags: 0
@@ -16004,14 +16131,20 @@ MonoBehaviour:
   spreadCompletionFraction: 0.9
   ignitionJitter: 4
   minOriginDistanceFromPlayer: 8
+  windBias: 0.45
+  windDriftDegreesPerSecond: 2
+  emberMaterial: {fileID: 2100000, guid: b3406cc425915a34ba2ee9bcef1686f5, type: 2}
+  emberRateNearFire: 40
+  leaveScorchMarks: 1
+  scorchColor: {r: 0.05, g: 0.04, b: 0.03, a: 0.75}
   damageRadius: 9
   maxDamagePerSecond: 0.2
   buildingIgniteRadius: 10
   buildingBurnSeconds: 20
   maxConcurrentBuildingFires: 4
   buildings: []
-  groundFirePrefab: {fileID: -548408306122104794, guid: 858e79faf6de940498a11b25374053d0, type: 3}
-  buildingFirePrefab: {fileID: 761814943410123144, guid: 244b1cc8940bd0844a05812855fbe45d, type: 3}
+  groundFirePrefab: {fileID: 4982806932889232237, guid: 7e8d30e7be9957c43862563919b4cbcf, type: 3}
+  buildingFirePrefab: {fileID: 4310393840343617559, guid: 8206b722d11501a449d6a278cca2adfa, type: 3}
   buildingFireScale: 6
   maxConcurrentVfx: 10
   vfxVisualRange: 70
@@ -16024,6 +16157,7 @@ MonoBehaviour:
   playerController: {fileID: 1301065030}
   damageTint: {fileID: 66397387}
   terrain: {fileID: 1473298224}
+  atmosphere: {fileID: 1642481536}
   shelters: []
   shelterMargin: 2
   tickInterval: 0.25
@@ -18550,6 +18684,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1642481535}
   - component: {fileID: 1642481534}
+  - component: {fileID: 1642481536}
   m_Layer: 0
   m_Name: DisasterManager
   m_TagString: Untagged
@@ -18583,6 +18718,7 @@ MonoBehaviour:
   earthquake: {fileID: 1241029357}
   wildfire: {fileID: 1339675628}
   playerController: {fileID: 1301065030}
+  atmosphere: {fileID: 1642481536}
 --- !u!4 &1642481535
 Transform:
   m_ObjectHideFlags: 0
@@ -18598,6 +18734,207 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1642481536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642481533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5022b4b92a7d245eea75a24bbd8d5697, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DisasterAtmosphere
+  sun: {fileID: 383907757}
+  volume: {fileID: 1135778586}
+  clear:
+    skybox: {fileID: 2100000, guid: c56e28e54cac24b04ae3dd957d214534, type: 2}
+    skyExposure: 1
+    skyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    fogColor: {r: 0.74, g: 0.84, b: 0.95, a: 1}
+    fogStart: 80
+    fogEnd: 320
+    sunColor: {r: 1, g: 0.96, b: 0.84, a: 1}
+    sunIntensity: 1.74
+    ambientIntensity: 1
+    saturation: 6
+    temperature: 0
+    exposure: 0.35
+    vignette: 0.22
+  flood:
+    warning:
+      skybox: {fileID: 2100000, guid: f2b5f3f20933f434e850db1b710542fd, type: 2}
+      skyExposure: 0.9
+      skyTint: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+      fogColor: {r: 0.62, g: 0.68, b: 0.74, a: 1}
+      fogStart: 60
+      fogEnd: 260
+      sunColor: {r: 0.85, g: 0.88, b: 0.95, a: 1}
+      sunIntensity: 1.1
+      ambientIntensity: 0.85
+      saturation: -10
+      temperature: -10
+      exposure: 0.2
+      vignette: 0.28
+    active:
+      skybox: {fileID: 2100000, guid: f2b5f3f20933f434e850db1b710542fd, type: 2}
+      skyExposure: 0.6
+      skyTint: {r: 0.42, g: 0.42, b: 0.42, a: 1}
+      fogColor: {r: 0.45, g: 0.5, b: 0.56, a: 1}
+      fogStart: 30
+      fogEnd: 170
+      sunColor: {r: 0.75, g: 0.8, b: 0.92, a: 1}
+      sunIntensity: 0.7
+      ambientIntensity: 0.7
+      saturation: -25
+      temperature: -20
+      exposure: 0.05
+      vignette: 0.35
+    peak:
+      skybox: {fileID: 2100000, guid: f2b5f3f20933f434e850db1b710542fd, type: 2}
+      skyExposure: 0.4
+      skyTint: {r: 0.32, g: 0.32, b: 0.32, a: 1}
+      fogColor: {r: 0.33, g: 0.37, b: 0.42, a: 1}
+      fogStart: 20
+      fogEnd: 120
+      sunColor: {r: 0.65, g: 0.72, b: 0.9, a: 1}
+      sunIntensity: 0.45
+      ambientIntensity: 0.55
+      saturation: -35
+      temperature: -30
+      exposure: -0.1
+      vignette: 0.42
+  blizzard:
+    warning:
+      skybox: {fileID: 2100000, guid: f2b5f3f20933f434e850db1b710542fd, type: 2}
+      skyExposure: 1.1
+      skyTint: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+      fogColor: {r: 0.8, g: 0.84, b: 0.9, a: 1}
+      fogStart: 50
+      fogEnd: 220
+      sunColor: {r: 0.88, g: 0.92, b: 1, a: 1}
+      sunIntensity: 1.2
+      ambientIntensity: 0.9
+      saturation: -15
+      temperature: -20
+      exposure: 0.3
+      vignette: 0.25
+    active:
+      skybox: {fileID: 2100000, guid: f2b5f3f20933f434e850db1b710542fd, type: 2}
+      skyExposure: 1.3
+      skyTint: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+      fogColor: {r: 0.86, g: 0.89, b: 0.93, a: 1}
+      fogStart: 12
+      fogEnd: 90
+      sunColor: {r: 0.82, g: 0.88, b: 1, a: 1}
+      sunIntensity: 0.9
+      ambientIntensity: 0.8
+      saturation: -45
+      temperature: -35
+      exposure: 0.35
+      vignette: 0.3
+    peak:
+      skybox: {fileID: 2100000, guid: f2b5f3f20933f434e850db1b710542fd, type: 2}
+      skyExposure: 1.4
+      skyTint: {r: 0.75, g: 0.75, b: 0.75, a: 1}
+      fogColor: {r: 0.9, g: 0.92, b: 0.95, a: 1}
+      fogStart: 6
+      fogEnd: 55
+      sunColor: {r: 0.8, g: 0.86, b: 1, a: 1}
+      sunIntensity: 0.75
+      ambientIntensity: 0.75
+      saturation: -60
+      temperature: -40
+      exposure: 0.4
+      vignette: 0.35
+  earthquake:
+    warning:
+      skybox: {fileID: 2100000, guid: c56e28e54cac24b04ae3dd957d214534, type: 2}
+      skyExposure: 1
+      skyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+      fogColor: {r: 0.74, g: 0.82, b: 0.9, a: 1}
+      fogStart: 80
+      fogEnd: 320
+      sunColor: {r: 1, g: 0.96, b: 0.84, a: 1}
+      sunIntensity: 1.74
+      ambientIntensity: 1
+      saturation: 6
+      temperature: 0
+      exposure: 0.35
+      vignette: 0.22
+    active:
+      skybox: {fileID: 2100000, guid: c56e28e54cac24b04ae3dd957d214534, type: 2}
+      skyExposure: 0.95
+      skyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+      fogColor: {r: 0.72, g: 0.68, b: 0.6, a: 1}
+      fogStart: 60
+      fogEnd: 260
+      sunColor: {r: 1, g: 0.93, b: 0.8, a: 1}
+      sunIntensity: 1.6
+      ambientIntensity: 0.95
+      saturation: -5
+      temperature: 8
+      exposure: 0.3
+      vignette: 0.26
+    peak:
+      skybox: {fileID: 2100000, guid: c56e28e54cac24b04ae3dd957d214534, type: 2}
+      skyExposure: 0.8
+      skyTint: {r: 0.48, g: 0.48, b: 0.48, a: 1}
+      fogColor: {r: 0.66, g: 0.6, b: 0.5, a: 1}
+      fogStart: 25
+      fogEnd: 150
+      sunColor: {r: 1, g: 0.88, b: 0.72, a: 1}
+      sunIntensity: 1.3
+      ambientIntensity: 0.85
+      saturation: -15
+      temperature: 15
+      exposure: 0.2
+      vignette: 0.32
+  wildfire:
+    warning:
+      skybox: {fileID: 2100000, guid: c56e28e54cac24b04ae3dd957d214534, type: 2}
+      skyExposure: 0.95
+      skyTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+      fogColor: {r: 0.8, g: 0.74, b: 0.62, a: 1}
+      fogStart: 60
+      fogEnd: 260
+      sunColor: {r: 1, g: 0.9, b: 0.72, a: 1}
+      sunIntensity: 1.6
+      ambientIntensity: 0.95
+      saturation: 0
+      temperature: 12
+      exposure: 0.3
+      vignette: 0.26
+    active:
+      skybox: {fileID: 2100000, guid: 2d796ced94d61438fbab81b194038162, type: 2}
+      skyExposure: 0.9
+      skyTint: {r: 0.6, g: 0.45, b: 0.35, a: 1}
+      fogColor: {r: 0.7, g: 0.52, b: 0.36, a: 1}
+      fogStart: 30
+      fogEnd: 170
+      sunColor: {r: 1, g: 0.72, b: 0.45, a: 1}
+      sunIntensity: 1.2
+      ambientIntensity: 0.85
+      saturation: 5
+      temperature: 30
+      exposure: 0.2
+      vignette: 0.32
+    peak:
+      skybox: {fileID: 2100000, guid: b4f152e0498484391a9f0d5a1facf03b, type: 2}
+      skyExposure: 0.8
+      skyTint: {r: 0.6, g: 0.35, b: 0.25, a: 1}
+      fogColor: {r: 0.48, g: 0.3, b: 0.2, a: 1}
+      fogStart: 12
+      fogEnd: 100
+      sunColor: {r: 1, g: 0.45, b: 0.25, a: 1}
+      sunIntensity: 0.8
+      ambientIntensity: 0.65
+      saturation: -5
+      temperature: 45
+      exposure: 0.05
+      vignette: 0.4
+  defaultTransitionSeconds: 8
 --- !u!1 &1642992560
 GameObject:
   m_ObjectHideFlags: 0

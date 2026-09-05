@@ -11,6 +11,21 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Health lost per second while exposed to snow or water. Health runs 0-1.")]
     [SerializeField] float hazardDamagePerSecond = 0.05f;
 
+    [Tooltip("Multiplier on hazard damage once the head is under water.")]
+    [SerializeField] float drowningMultiplier = 3f;
+
+    [Tooltip("Submersion (0-1) above which the player is drowning rather than wading.")]
+    [SerializeField] float drownSubmersion = 0.97f;
+
+    /// <summary>
+    /// Scales the per-second hazard damage. Hazards set this to express severity: a blizzard
+    /// that has chilled the player for a minute hurts more than the first flurry. 1 = normal.
+    /// </summary>
+    public float HazardDamageMultiplier { get; set; } = 1f;
+
+    /// <summary>True while the head is under water. Read by the HUD and by Flood for audio muffling.</summary>
+    public bool IsDrowning { get; private set; }
+
     [Header("Regeneration")]
     [Tooltip("Seconds without taking damage before health starts regenerating.")]
     [SerializeField] float regenDelaySeconds = 6f;
@@ -45,11 +60,19 @@ public class PlayerController : MonoBehaviour
         if (isGameOver)
             return;
 
-        bool exposed = touchingSnow || inWater;
+        float submersion = firstPersonController != null ? firstPersonController.Submersion : 0f;
+        IsDrowning = submersion >= drownSubmersion;
+        bool exposed = touchingSnow || inWater || submersion > 0.3f;
 
         // Snow and deep water make movement heavy; shelter (or dry land) restores it.
+        // Swimming is slower still.
         if (firstPersonController != null)
-            firstPersonController.EnvironmentSpeedMultiplier = exposed ? hazardSpeedMultiplier : 1f;
+        {
+            float mult = exposed ? hazardSpeedMultiplier : 1f;
+            if (firstPersonController.IsSwimming)
+                mult *= 0.75f;
+            firstPersonController.EnvironmentSpeedMultiplier = mult;
+        }
 
         if (exposed)
         {
@@ -58,7 +81,14 @@ public class PlayerController : MonoBehaviour
             if (damageTickAccumulator >= 1f)
             {
                 damageTickAccumulator = 0f;
-                TakeDamage(hazardDamagePerSecond);
+
+                float damage = hazardDamagePerSecond * HazardDamageMultiplier;
+                if (IsDrowning)
+                    damage *= drowningMultiplier;            // no air: this is what actually kills in a flood
+                else if (!touchingSnow && submersion > 0f)
+                    damage *= Mathf.Lerp(0.3f, 1f, submersion); // wading is only mildly harmful; deep cold water more so
+
+                TakeDamage(damage);
             }
         }
         else

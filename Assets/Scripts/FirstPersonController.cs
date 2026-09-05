@@ -46,6 +46,31 @@ public class FirstPersonController : MonoBehaviour
     /// </summary>
     public float EnvironmentSpeedMultiplier { get; set; } = 1f;
 
+    /// <summary>
+    /// World-space velocity pushed onto the player by the environment: wind, flood current, an
+    /// earthquake stumble. Added on top of the player's own movement each frame.
+    /// </summary>
+    public Vector3 ExternalVelocity { get; set; }
+
+    /// <summary>
+    /// World Y of the water surface, or negative infinity when there is no water. Set by Flood.
+    /// </summary>
+    public float WaterSurfaceY { get; set; } = float.NegativeInfinity;
+
+    /// <summary>How deep the player is in water: 0 = dry, 1 = fully under.</summary>
+    public float Submersion { get; private set; }
+
+    /// <summary>True while the water is deep enough that the player floats rather than walks.</summary>
+    public bool IsSwimming => Submersion >= swimSubmersion;
+
+    [Header("Water")]
+    [Tooltip("Submersion (0-1 of body height) at which walking gives way to swimming.")]
+    [SerializeField] private float swimSubmersion = 0.62f;
+    [Tooltip("Submersion the body settles at when floating: head just clear of the surface.")]
+    [SerializeField] private float neutralSubmersion = 0.86f;
+    [Tooltip("Upward speed while holding jump in the water.")]
+    [SerializeField] private float swimUpSpeed = 2.2f;
+
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -122,32 +147,61 @@ public class FirstPersonController : MonoBehaviour
             animator.SetFloat(SpeedParam, horizontalVelocity.magnitude / Mathf.Max(currentMoveSpeed, 0.01f));
         }
 
-        // Reset downward velocity while grounded so gravity doesn't accumulate.
-        if (characterController.isGrounded && velocity.y < 0f)
+        UpdateSubmersion();
+
+        if (IsSwimming)
         {
-            velocity.y = -2f;
+            // Buoyancy: drift towards the neutral float depth, kick upward while jump is held.
+            // Gravity is off here; the water carries the body.
+            // Strong enough to outpace a fast-rising flood: a body bobs up faster than water climbs.
+            float targetY = (Submersion - neutralSubmersion) * 14f;
+            if (keyboard.spaceKey.isPressed && Submersion > neutralSubmersion - 0.15f)
+                targetY = swimUpSpeed;
+            velocity.y = Mathf.MoveTowards(velocity.y, targetY, 10f * Time.deltaTime);
+        }
+        else
+        {
+            // Reset downward velocity while grounded so gravity doesn't accumulate.
+            if (characterController.isGrounded && velocity.y < 0f)
+            {
+                velocity.y = -2f;
+            }
+
+            if (keyboard.spaceKey.wasPressedThisFrame && characterController.isGrounded)
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
+
+            // Better jumping (Board To Bits): fall faster than we rise, and cut the
+            // jump short when the button is released early for variable jump height.
+            float gravityScale = 1f;
+            if (velocity.y < 0f)
+            {
+                gravityScale = fallMultiplier;
+            }
+            else if (velocity.y > 0f && !keyboard.spaceKey.isPressed)
+            {
+                gravityScale = lowJumpMultiplier;
+            }
+
+            // Wading in shallow water drags the fall and the jump alike.
+            gravityScale *= Mathf.Lerp(1f, 0.35f, Submersion);
+            velocity.y += gravity * gravityScale * Time.deltaTime;
         }
 
-        if (keyboard.spaceKey.wasPressedThisFrame && characterController.isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
-
-        // Better jumping (Board To Bits): fall faster than we rise, and cut the
-        // jump short when the button is released early for variable jump height.
-        float gravityScale = 1f;
-        if (velocity.y < 0f)
-        {
-            gravityScale = fallMultiplier;
-        }
-        else if (velocity.y > 0f && !keyboard.spaceKey.isPressed)
-        {
-            gravityScale = lowJumpMultiplier;
-        }
-
-        velocity.y += gravity * gravityScale * Time.deltaTime;
-
-        Vector3 displacement = horizontalVelocity + Vector3.up * velocity.y;
+        Vector3 displacement = horizontalVelocity + ExternalVelocity + Vector3.up * velocity.y;
         characterController.Move(displacement * Time.deltaTime);
+    }
+
+    private void UpdateSubmersion()
+    {
+        if (float.IsNegativeInfinity(WaterSurfaceY))
+        {
+            Submersion = 0f;
+            return;
+        }
+
+        float feet = transform.position.y + characterController.center.y - characterController.height * 0.5f;
+        Submersion = Mathf.Clamp01((WaterSurfaceY - feet) / Mathf.Max(characterController.height, 0.01f));
     }
 }
