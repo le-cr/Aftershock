@@ -33,44 +33,68 @@ namespace Aftershock.Editor
             string insideMaterial = "Assets/Materials/FractureInside.mat",
             [CliArg("key", "KeyCode name that triggers the collapse.")] string key = "T")
         {
+            var parentTransform = ResolveParent(parent);
+            var go = Create(model, name, parentTransform, new Vector3(x, y, z), 0f, scale, fragmentCount, insideMaterial, key, replaceExisting: true);
+            var mesh = go.GetComponent<MeshFilter>().sharedMesh;
+            var material = go.GetComponent<MeshRenderer>().sharedMaterial;
+            var inside = AssetDatabase.LoadAssetAtPath<Material>(insideMaterial);
+            var collapse = go.GetComponent<BuildingCollapse>();
+
+            EditorSceneManager.MarkSceneDirty(go.scene);
+
+            return new
+            {
+                created = go.name,
+                hierarchyPath = GetHierarchyPath(go.transform),
+                instanceId = go.GetInstanceID(),
+                meshPath = AssetDatabase.GetAssetPath(mesh),
+                vertexCount = mesh.vertexCount,
+                bounds = new { size = Vec(mesh.bounds.size), center = Vec(mesh.bounds.center) },
+                material = material != null ? material.name : null,
+                insideMaterial = inside != null ? inside.name : null,
+                fragmentCount,
+                collapseKey = collapse.collapseKey.ToString(),
+            };
+        }
+
+        static Transform ResolveParent(string parent)
+        {
+            if (string.IsNullOrEmpty(parent))
+                return null;
+            var parentGo = GameObject.Find(parent);
+            if (parentGo == null)
+                throw new System.ArgumentException($"No GameObject found at hierarchy path '{parent}'.");
+            return parentGo.transform;
+        }
+
+        /// <summary>
+        /// Build one fracturable building from a model. Shared by the single-building command and
+        /// the city builder. The combined mesh is cached per model under Assets/Models/Generated.
+        /// </summary>
+        public static GameObject Create(string model, string name, Transform parentTransform, Vector3 position, float yaw, float scale,
+            int fragmentCount, string insideMaterial, string key, bool replaceExisting)
+        {
             var source = AssetDatabase.LoadAssetAtPath<GameObject>(model);
             if (source == null)
                 throw new System.ArgumentException($"No model asset found at '{model}'.");
 
             EnsureMeshIsReadable(model);
 
-            Transform parentTransform = null;
-            if (!string.IsNullOrEmpty(parent))
-            {
-                var parentGo = GameObject.Find(parent);
-                if (parentGo == null)
-                    throw new System.ArgumentException($"No GameObject found at hierarchy path '{parent}'.");
-                parentTransform = parentGo.transform;
-            }
+            var mesh = LoadOrBuildCombinedMesh(source, out var material);
 
-            // Pull the geometry out of the model. Kenney kit pieces are a handful of child meshes
-            // sharing one atlas material, and Fracture needs a single MeshFilter on one object.
-            var instance = (GameObject)PrefabUtility.InstantiatePrefab(source);
-            Mesh mesh;
-            Material material;
-            try
+            if (replaceExisting)
             {
-                mesh = BuildCombinedMesh(instance, source.name, out material);
+                var existing = GameObject.Find(parentTransform != null ? $"{GetHierarchyPath(parentTransform)}/{name}" : $"/{name}");
+                if (existing != null)
+                    Undo.DestroyObjectImmediate(existing);
             }
-            finally
-            {
-                Object.DestroyImmediate(instance);
-            }
-
-            var existing = GameObject.Find(parentTransform != null ? $"{parent}/{name}" : $"/{name}");
-            if (existing != null)
-                Undo.DestroyObjectImmediate(existing);
 
             var go = new GameObject(name);
             Undo.RegisterCreatedObjectUndo(go, "Create Collapsing Building");
             if (parentTransform != null)
                 go.transform.SetParent(parentTransform, true);
-            go.transform.position = new Vector3(x, y, z);
+            go.transform.position = position;
+            go.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
             go.transform.localScale = Vector3.one * scale;
 
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
@@ -88,8 +112,6 @@ namespace Aftershock.Editor
             var inside = AssetDatabase.LoadAssetAtPath<Material>(insideMaterial);
 
             var fracture = go.AddComponent<Fracture>();
-            // The collapse script drives the fracture itself, so leave the component's own trigger
-            // inert: Collision with tag filtering off can never fire (see Fracture.OnCollisionEnter).
             fracture.triggerOptions = new TriggerOptions
             {
                 triggerType = TriggerType.Collision,
@@ -116,21 +138,28 @@ namespace Aftershock.Editor
             var collapse = go.AddComponent<BuildingCollapse>();
             collapse.collapseKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), key, true);
 
-            EditorSceneManager.MarkSceneDirty(go.scene);
+            return go;
+        }
 
-            return new
+        /// <summary>Reuse the cached combined mesh for a model when one exists; otherwise build it.</summary>
+        static Mesh LoadOrBuildCombinedMesh(GameObject source, out Material material)
+        {
+            var path = $"{k_GeneratedMeshFolder}/{source.name}_fracture.asset";
+            var cached = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            var renderer = source.GetComponentInChildren<MeshRenderer>();
+            material = renderer != null ? renderer.sharedMaterial : null;
+            if (cached != null && cached.vertexCount > 0)
+                return cached;
+
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(source);
+            try
             {
-                created = go.name,
-                hierarchyPath = GetHierarchyPath(go.transform),
-                instanceId = go.GetInstanceID(),
-                meshPath = AssetDatabase.GetAssetPath(mesh),
-                vertexCount = mesh.vertexCount,
-                bounds = new { size = Vec(mesh.bounds.size), center = Vec(mesh.bounds.center) },
-                material = material != null ? material.name : null,
-                insideMaterial = inside != null ? inside.name : null,
-                fragmentCount,
-                collapseKey = collapse.collapseKey.ToString(),
-            };
+                return BuildCombinedMesh(instance, source.name, out material);
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
         }
 
         [CliCommand("collapse_building",
@@ -203,7 +232,7 @@ namespace Aftershock.Editor
             importer.SaveAndReimport();
         }
 
-        static string GetHierarchyPath(Transform t)
+        public static string GetHierarchyPath(Transform t)
         {
             var path = "/" + t.name;
             while (t.parent != null)
