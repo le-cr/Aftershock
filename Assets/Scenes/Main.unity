@@ -12209,6 +12209,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a831d036f97b4b368afe935cee5ce1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthBar
+  fullColor: {r: 0.3, g: 0.85, b: 0.35, a: 1}
+  midColor: {r: 0.95, g: 0.8, b: 0.2, a: 1}
+  emptyColor: {r: 0.9, g: 0.15, b: 0.1, a: 1}
   playerController: {fileID: 1301065030}
 --- !u!114 &1041059238
 MonoBehaviour:
@@ -18440,10 +18443,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfa95c5b8f6ed43f783542688003d5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisasterManager
-  warningSeconds: 10
+  warningSeconds: 30
   surviveSeconds: 120
-  overrideRandomPick: 1
-  forcedDisaster: 3
+  overrideRandomPick: 0
+  forcedDisaster: 0
   disasterGroup: {fileID: 1067583971}
   disasterText: {fileID: 885519195}
   disasterTimer: {fileID: 1828585454}

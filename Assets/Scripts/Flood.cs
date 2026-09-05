@@ -10,7 +10,13 @@ public class Flood : MonoBehaviour
     [SerializeField] float floodSpeed = 1f;
     [SerializeField] float maxFloodHeight = 10f;
 
+    [Tooltip("The rise accelerates by this factor over the flood's life, so it starts gentle and ends urgent.")]
+    [SerializeField] float endSpeedMultiplier = 2.5f;
+    [Tooltip("Seconds over which the rise ramps from base speed to base speed x endSpeedMultiplier.")]
+    [SerializeField] float rampSeconds = 90f;
+
     private bool isFlooding;
+    private float floodStartTime;
 
     public bool IsFlooding => isFlooding;
 
@@ -18,6 +24,7 @@ public class Flood : MonoBehaviour
     public void BeginFlood()
     {
         isFlooding = true;
+        floodStartTime = Time.time;
     }
 
     public void StopFlood()
@@ -34,7 +41,9 @@ public class Flood : MonoBehaviour
         }
         if (isFlooding)
         {
-            transform.Translate(Vector3.up * floodSpeed * Time.deltaTime, Space.World);
+            float ramp = Mathf.Clamp01((Time.time - floodStartTime) / Mathf.Max(rampSeconds, 0.01f));
+            float speed = floodSpeed * Mathf.Lerp(1f, endSpeedMultiplier, ramp);
+            transform.Translate(Vector3.up * speed * Time.deltaTime, Space.World);
         }
     }
 

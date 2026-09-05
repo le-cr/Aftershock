@@ -1,7 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,41 +7,80 @@ public class PlayerController : MonoBehaviour
     public bool inWater;
     public bool touchingSnow;
 
-    [Header("Constants")]
-    [SerializeField] float floodTimeMultiplier = 1.5f;
-    [SerializeField] float damage = -0.05f;
+    [Header("Hazard damage")]
+    [Tooltip("Health lost per second while exposed to snow or water. Health runs 0-1.")]
+    [SerializeField] float hazardDamagePerSecond = 0.05f;
+
+    [Header("Regeneration")]
+    [Tooltip("Seconds without taking damage before health starts regenerating.")]
+    [SerializeField] float regenDelaySeconds = 6f;
+
+    [Tooltip("Health regained per second once regeneration kicks in.")]
+    [SerializeField] float regenPerSecond = 0.03f;
+
+    [Header("Environmental slow")]
+    [Tooltip("Move-speed multiplier while wading through water or exposed to blizzard snow.")]
+    [Range(0.1f, 1f)]
+    [SerializeField] float hazardSpeedMultiplier = 0.6f;
 
     [Header("References")]
     [SerializeField] HealthBar healthBar;
     [SerializeField] GameObject deathScreen;
     [SerializeField] GameObject winScreen;
 
-    private float timeSinceDamage = 0f;
+    private DamageTint damageTint;
+    private FirstPersonController firstPersonController;
+    private float lastDamageTime = float.NegativeInfinity;
+    private float damageTickAccumulator;
     private bool isGameOver = false;
 
-    // Update is called once per frame
+    void Awake()
+    {
+        firstPersonController = GetComponent<FirstPersonController>();
+        damageTint = FindFirstObjectByType<DamageTint>(FindObjectsInactive.Include);
+    }
+
     void Update()
     {
         if (isGameOver)
             return;
 
-        timeSinceDamage += Time.deltaTime;
-        if (touchingSnow || inWater)
+        bool exposed = touchingSnow || inWater;
+
+        // Snow and deep water make movement heavy; shelter (or dry land) restores it.
+        if (firstPersonController != null)
+            firstPersonController.EnvironmentSpeedMultiplier = exposed ? hazardSpeedMultiplier : 1f;
+
+        if (exposed)
         {
-            if (timeSinceDamage > 1f) {
-                healthBar.ChangeHealth(damage);
-                timeSinceDamage = 0f;
+            // Tick damage once per second so each hit is big enough to register on the tint.
+            damageTickAccumulator += Time.deltaTime;
+            if (damageTickAccumulator >= 1f)
+            {
+                damageTickAccumulator = 0f;
+                TakeDamage(hazardDamagePerSecond);
             }
+        }
+        else
+        {
+            damageTickAccumulator = 0f;
+
+            if (Time.time - lastDamageTime >= regenDelaySeconds)
+                healthBar.ChangeHealth(regenPerSecond * Time.deltaTime);
         }
     }
 
-    /// <summary>External hazards (falling debris, etc.) route damage through here.</summary>
+    /// <summary>All hazards (snow, water, fire, falling debris) route damage through here.</summary>
     public void TakeDamage(float amount)
     {
         if (isGameOver)
             return;
 
+        lastDamageTime = Time.time;
         healthBar.ChangeHealth(-Mathf.Abs(amount));
+
+        if (damageTint != null)
+            damageTint.Flash(Mathf.Clamp01(Mathf.Abs(amount) * 8f + 0.4f));
     }
 
     public void Respawn()

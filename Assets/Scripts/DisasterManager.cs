@@ -72,7 +72,7 @@ public class DisasterManager : MonoBehaviour
             wildfire.Prepare();
 
         if (disasterText != null)
-            disasterText.text = chosenDisaster + " in";
+            disasterText.text = chosenDisaster.ToString().ToUpperInvariant() + " in";
 
         if (disasterGroup != null)
             disasterGroup.SetActive(true);

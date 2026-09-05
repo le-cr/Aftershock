@@ -11,6 +11,8 @@ public class FirstPersonController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
+    [Tooltip("Move speed multiplier while Left Shift is held.")]
+    [SerializeField] private float sprintMultiplier = 1.6f;
     [Tooltip("Units/s² ramp up to full speed. High values keep starts snappy; ~100 reaches moveSpeed in about a frame or two.")]
     [SerializeField] private float acceleration = 100f;
     [Tooltip("Units/s² ramp down to a stop. Keep at or above acceleration so stops don't feel slidey.")]
@@ -37,6 +39,12 @@ public class FirstPersonController : MonoBehaviour
     private float pitch;
 
     private static readonly int SpeedParam = Animator.StringToHash("Speed");
+
+    /// <summary>
+    /// Move-speed multiplier applied by hazards (deep water, blizzard cold). 1 = unaffected.
+    /// Set every frame by PlayerController; sprinting stacks on top of it.
+    /// </summary>
+    public float EnvironmentSpeedMultiplier { get; set; } = 1f;
 
     private void Awake()
     {
@@ -103,13 +111,15 @@ public class FirstPersonController : MonoBehaviour
 
         // Ramp toward the target velocity fast enough to feel instant, while still
         // smoothing over a frame or two so the animator blend doesn't pop.
-        Vector3 targetVelocity = moveDirection * moveSpeed;
+        float sprint = keyboard.leftShiftKey.isPressed ? sprintMultiplier : 1f;
+        float currentMoveSpeed = moveSpeed * sprint * Mathf.Clamp(EnvironmentSpeedMultiplier, 0.1f, 2f);
+        Vector3 targetVelocity = moveDirection * currentMoveSpeed;
         float rate = targetVelocity.sqrMagnitude > horizontalVelocity.sqrMagnitude ? acceleration : deceleration;
         horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, targetVelocity, rate * Time.deltaTime);
 
         if (animator != null)
         {
-            animator.SetFloat(SpeedParam, horizontalVelocity.magnitude / moveSpeed);
+            animator.SetFloat(SpeedParam, horizontalVelocity.magnitude / Mathf.Max(currentMoveSpeed, 0.01f));
         }
 
         // Reset downward velocity while grounded so gravity doesn't accumulate.
