@@ -15,7 +15,7 @@ namespace Aftershock.Editor
     {
         [CliCommand("amp_earthquake", "Apply stronger earthquake + debris damage values, enable fragment despawn, and lower Fracture.fragmentCount on every collapsing building in the open scene.")]
         public static object AmpEarthquake(
-            [CliArg("fragment_count", "OpenFracture fragments per building.")] int fragmentCount = 36)
+            [CliArg("fragment_count", "OpenFracture fragments per building.")] int fragmentCount = 24)
         {
             var log = new List<string>();
             fragmentCount = Mathf.Clamp(fragmentCount, 12, 80);
@@ -29,13 +29,24 @@ namespace Aftershock.Editor
                 Set(so, "shakeMagnitude", 0.62f);
                 Set(so, "leadIn", 0.45f);
                 Set(so, "initialCollapseCount", 4);
-                Set(so, "firstInterval", 8f);
-                Set(so, "intervalGrowth", 0.22f);
+                Set(so, "nearestCollapseChance", 0.6f);
+                Set(so, "nearestPoolSize", 4);
+                Set(so, "collapseDamage", 0.35f);
+                Set(so, "collapseDamageRadius", 12f);
+                Set(so, "facadeDebrisPerSecond", 4f);
+                Set(so, "facadeDebrisShakeThreshold", 0.2f);
+                Set(so, "facadeDebrisRadius", 20f);
+                Set(so, "facadeChunkDamage", 0.12f);
+                Set(so, "facadeChunkAim", 0.7f);
+                Set(so, "facadeChunkLifetime", 8f);
+                Set(so, "maxFacadeChunks", 24);
+                Set(so, "firstInterval", 6f);
+                Set(so, "intervalGrowth", 0.15f);
                 Set(so, "aftershockShakeDuration", 5f);
                 Set(so, "aftershockMagnitudeScale", 0.78f);
-                Set(so, "bigAftershockChance", 0.28f);
-                Set(so, "collapseThreshold", 0.35f);
-                Set(so, "stumblePerMetre", 5.5f);
+                Set(so, "bigAftershockChance", 0.4f);
+                Set(so, "collapseThreshold", 0.3f);
+                Set(so, "stumblePerMetre", 7f);
                 Set(so, "dustRateAtFullShake", 90f);
                 Set(so, "collapseDustBurst", 130);
                 so.ApplyModifiedPropertiesWithoutUndo();
@@ -52,19 +63,19 @@ namespace Aftershock.Editor
             foreach (var collapse in Object.FindObjectsByType<BuildingCollapse>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 var so = new SerializedObject(collapse);
-                Set(so, "explosionForce", 6.5f);
+                Set(so, "explosionForce", 10f);
                 Set(so, "explosionRadius", 28f);
                 Set(so, "upwardsModifier", 0.65f);
-                Set(so, "lateralScatter", 2.2f);
+                Set(so, "lateralScatter", 3f);
                 Set(so, "randomTorque", 2f);
                 Set(so, "fragmentDrag", 0.35f);
                 Set(so, "fragmentAngularDrag", 2.5f);
-                Set(so, "debrisDamage", 0.2f);
-                Set(so, "debrisMinImpactSpeed", 1.8f);
+                Set(so, "debrisDamage", 0.3f);
+                Set(so, "debrisMinImpactSpeed", 1.2f);
                 Set(so, "debrisRearmSeconds", 0.35f);
                 so.FindProperty("despawnFragments").boolValue = true;
-                Set(so, "fragmentLifetime", 28f);
-                Set(so, "speculativeSeconds", 2.5f);
+                Set(so, "fragmentLifetime", 18f);
+                Set(so, "speculativeSeconds", 1.25f);
                 so.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(collapse);
                 buildings++;
@@ -103,13 +114,13 @@ namespace Aftershock.Editor
             return new { changes = log };
         }
 
-        static void Set(SerializedObject so, string prop, float value)
+        internal static void Set(SerializedObject so, string prop, float value)
         {
             var p = so.FindProperty(prop);
             if (p != null) p.floatValue = value;
         }
 
-        static void Set(SerializedObject so, string prop, int value)
+        internal static void Set(SerializedObject so, string prop, int value)
         {
             var p = so.FindProperty(prop);
             if (p != null) p.intValue = value;

@@ -42,6 +42,8 @@ public class MainMenuController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        // Back on the title screen — Inspector values on Main win again until Play is pressed.
+        GameSettings.ClearMenuOverrides();
         GameSettings.ApplyAudioVolume();
 
         if (mainPanel != null) mainPanel.SetActive(true);
@@ -196,6 +198,7 @@ public class MainMenuController : MonoBehaviour
     void OnPlay()
     {
         GameSettings.ApplyAudioVolume();
+        GameSettings.ArmMenuOverrides();
         SceneManager.LoadScene(MainSceneName);
     }
 

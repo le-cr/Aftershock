@@ -2,29 +2,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Caps live building rubble so earthquake debris can't spawn thousands of MeshCollider
-/// Rigidbodies and stall or crash the physics step. Buildings register fragment roots here
-/// after they collapse; this manager culls the oldest piles when over budget, sleeps settled
-/// chunks, and downgrades their collision mode once they've stopped flying.
+/// Hard cap on live building-fragment Rigidbodies. New collapses are refused when the cap is
+/// full, and any pile that would push past the limit is trimmed with DestroyImmediate so the
+/// physics step never sees more bodies than <see cref="HardLimit"/>.
 /// </summary>
 public class DebrisBudget : MonoBehaviour
 {
     public static DebrisBudget Instance { get; private set; }
 
-    [Tooltip("Hard cap on live fragment Rigidbodies. Oldest piles are destroyed first when exceeded.")]
-    [SerializeField] int maxLiveFragments = 220;
+    /// <summary>Absolute maximum fragment Rigidbodies allowed in the scene at once.</summary>
+    public const int HardLimit = 96;
 
-    [Tooltip("Seconds after a pile is registered before it becomes eligible for budget culls.")]
-    [SerializeField] float graceSeconds = 4f;
+    [Tooltip("Hard cap on live fragment Rigidbodies. Enforced immediately with DestroyImmediate.")]
+    [SerializeField] int maxLiveFragments = HardLimit;
 
     [Tooltip("How often to sleep / simplify settled fragments.")]
-    [SerializeField] float settleInterval = 0.5f;
+    [SerializeField] float settleInterval = 0.35f;
 
     [Tooltip("Speed below which a fragment is treated as settled.")]
-    [SerializeField] float settleSpeed = 0.35f;
+    [SerializeField] float settleSpeed = 0.4f;
 
-    [Tooltip("Destroy entire piles older than this many seconds (in addition to per-building lifetime).")]
-    [SerializeField] float maxPileAge = 40f;
+    [Tooltip("Destroy entire piles older than this many seconds.")]
+    [SerializeField] float maxPileAge = 22f;
 
     struct Pile
     {
@@ -35,21 +34,23 @@ public class DebrisBudget : MonoBehaviour
 
     readonly List<Pile> piles = new List<Pile>(16);
     float nextSettleTime;
+    int cachedLive;
+
+    public int LiveCount => cachedLive;
+    public int MaxLive => Mathf.Max(8, maxLiveFragments);
+    public int FreeSlots => Mathf.Max(0, MaxLive - LiveCount);
+    public bool IsFull => LiveCount >= MaxLive;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Bootstrap()
     {
-        // Recreate per loaded scene so rubble state never survives a Main reload.
-        if (Instance != null) return;
-        if (Object.FindFirstObjectByType<DebrisBudget>() != null) return;
-        new GameObject("DebrisBudget").AddComponent<DebrisBudget>();
+        Ensure();
     }
 
-    /// <summary>Ensure a budget manager exists in the active scene.</summary>
     public static DebrisBudget Ensure()
     {
         if (Instance != null) return Instance;
-        var existing = Object.FindFirstObjectByType<DebrisBudget>();
+        var existing = FindFirstObjectByType<DebrisBudget>();
         if (existing != null) return Instance = existing;
         return new GameObject("DebrisBudget").AddComponent<DebrisBudget>();
     }
@@ -62,6 +63,7 @@ public class DebrisBudget : MonoBehaviour
             return;
         }
         Instance = this;
+        maxLiveFragments = HardLimit;
     }
 
     void OnDestroy()
@@ -70,13 +72,26 @@ public class DebrisBudget : MonoBehaviour
             Instance = null;
     }
 
-    /// <summary>Track a freshly fractured building so it can be culled / settled.</summary>
+    /// <summary>True when at least one more collapse is allowed under the hard cap.</summary>
+    public bool CanCollapse(int estimatedFragments = 24)
+    {
+        RefreshLiveCount();
+        return FreeSlots >= Mathf.Max(8, estimatedFragments / 3);
+    }
+
+    /// <summary>
+    /// Track a freshly fractured pile and immediately destroy excess fragments until under the
+    /// hard cap. Uses DestroyImmediate so the physics engine never simulates over-budget bodies.
+    /// </summary>
     public void RegisterPile(Transform fragmentRoot)
     {
         if (fragmentRoot == null) return;
 
         var bodies = new List<Rigidbody>(64);
         fragmentRoot.GetComponentsInChildren(true, bodies);
+        // Drop nulls / already-dead.
+        bodies.RemoveAll(b => b == null);
+
         piles.Add(new Pile
         {
             root = fragmentRoot,
@@ -84,21 +99,35 @@ public class DebrisBudget : MonoBehaviour
             bodies = bodies,
         });
 
-        EnforceBudget();
+        RefreshLiveCount();
+        EnforceHardLimitImmediate();
     }
 
     void Update()
     {
-        if (piles.Count == 0) return;
+        if (piles.Count == 0)
+        {
+            cachedLive = 0;
+            return;
+        }
 
         CullExpiredPiles();
+        RefreshLiveCount();
 
         if (Time.time >= nextSettleTime)
         {
             nextSettleTime = Time.time + settleInterval;
             SettleFragments();
-            EnforceBudget();
+            if (cachedLive > MaxLive)
+                EnforceHardLimitImmediate();
         }
+    }
+
+    void LateUpdate()
+    {
+        // Catch anything that slipped through Destroy() schedules or async fracture runners.
+        if (cachedLive > MaxLive)
+            EnforceHardLimitImmediate();
     }
 
     void CullExpiredPiles()
@@ -115,7 +144,7 @@ public class DebrisBudget : MonoBehaviour
 
             if (now - pile.born >= maxPileAge)
             {
-                Destroy(pile.root.gameObject);
+                DestroyImmediateSafe(pile.root.gameObject);
                 piles.RemoveAt(i);
             }
         }
@@ -138,108 +167,125 @@ public class DebrisBudget : MonoBehaviour
                 if (rb.linearVelocity.sqrMagnitude <= speedSq &&
                     rb.angularVelocity.sqrMagnitude <= speedSq)
                 {
-                    // Discrete is far cheaper once chunks are on the ground; ContinuousSpeculative
-                    // was only needed while they were flying through the player.
                     if (rb.collisionDetectionMode != CollisionDetectionMode.Discrete)
                         rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
-
                     rb.Sleep();
                 }
             }
         }
     }
 
-    void EnforceBudget()
+    void EnforceHardLimitImmediate()
     {
-        int live = CountLive();
-        if (live <= maxLiveFragments) return;
-
-        // Destroy oldest piles first (skip those still in the grace window so the current
-        // collapse still feels violent).
-        float now = Time.time;
-        while (live > maxLiveFragments && piles.Count > 0)
+        RefreshLiveCount();
+        int guard = 0;
+        while (cachedLive > MaxLive && piles.Count > 0 && guard++ < 512)
         {
-            int victim = -1;
-            float oldest = float.PositiveInfinity;
-            for (int i = 0; i < piles.Count; i++)
-            {
-                var pile = piles[i];
-                if (pile.root == null) continue;
-                if (now - pile.born < graceSeconds) continue;
-                if (pile.born < oldest)
-                {
-                    oldest = pile.born;
-                    victim = i;
-                }
-            }
-
-            // Everything is still in grace — thin the oldest pile's farthest fragments instead.
+            // Prefer destroying whole oldest piles — cheapest way to free MeshColliders.
+            int victim = OldestPileIndex();
             if (victim < 0)
-            {
-                ThinLargestPile(live - maxLiveFragments);
-                return;
-            }
+                break;
 
             var doomed = piles[victim];
-            int removed = doomed.bodies != null ? CountValid(doomed.bodies) : 0;
+            int before = cachedLive;
             if (doomed.root != null)
-                Destroy(doomed.root.gameObject);
+                DestroyImmediateSafe(doomed.root.gameObject);
             piles.RemoveAt(victim);
-            live -= removed;
+            RefreshLiveCount();
+
+            // If destroying the root didn't free enough (or root was already gone), thin bodies.
+            if (cachedLive >= before)
+                ThinAnyFragments(cachedLive - MaxLive);
         }
+
+        // Final trim in case only partial piles remain over budget.
+        if (cachedLive > MaxLive)
+            ThinAnyFragments(cachedLive - MaxLive);
     }
 
-    void ThinLargestPile(int needToRemove)
+    int OldestPileIndex()
     {
-        if (needToRemove <= 0 || piles.Count == 0) return;
-
-        int best = 0;
-        int bestCount = 0;
+        int victim = -1;
+        float oldest = float.PositiveInfinity;
         for (int i = 0; i < piles.Count; i++)
         {
-            int c = piles[i].bodies != null ? CountValid(piles[i].bodies) : 0;
-            if (c > bestCount)
+            if (piles[i].root == null && CountValid(piles[i].bodies) == 0)
+                continue;
+            if (piles[i].born < oldest)
             {
-                bestCount = c;
-                best = i;
+                oldest = piles[i].born;
+                victim = i;
+            }
+        }
+        return victim;
+    }
+
+    void ThinAnyFragments(int needToRemove)
+    {
+        if (needToRemove <= 0) return;
+
+        // Flatten into a temp list of (pileIndex, bodyIndex, mass) and kill lightest first.
+        var entries = new List<(int pile, int body, float mass)>(needToRemove + 8);
+        for (int p = 0; p < piles.Count; p++)
+        {
+            var bodies = piles[p].bodies;
+            if (bodies == null) continue;
+            for (int b = 0; b < bodies.Count; b++)
+            {
+                var rb = bodies[b];
+                if (rb == null) continue;
+                entries.Add((p, b, rb.mass));
             }
         }
 
-        var pile = piles[best];
-        if (pile.bodies == null || pile.root == null) return;
-
-        // Drop the smallest / lowest fragments first — they read least as flying debris.
-        pile.bodies.Sort((a, b) =>
-        {
-            float ma = a != null ? a.mass : 0f;
-            float mb = b != null ? b.mass : 0f;
-            return ma.CompareTo(mb);
-        });
+        entries.Sort((a, b) => a.mass.CompareTo(b.mass));
 
         int removed = 0;
-        for (int i = 0; i < pile.bodies.Count && removed < needToRemove; i++)
+        for (int i = 0; i < entries.Count && removed < needToRemove; i++)
         {
-            var rb = pile.bodies[i];
+            var e = entries[i];
+            var bodies = piles[e.pile].bodies;
+            var rb = bodies[e.body];
             if (rb == null) continue;
-            Destroy(rb.gameObject);
-            pile.bodies[i] = null;
+            DestroyImmediateSafe(rb.gameObject);
+            bodies[e.body] = null;
             removed++;
         }
+
+        RefreshLiveCount();
     }
 
-    int CountLive()
+    void RefreshLiveCount()
     {
         int n = 0;
-        for (int i = 0; i < piles.Count; i++)
-            n += piles[i].bodies != null ? CountValid(piles[i].bodies) : 0;
-        return n;
+        for (int i = piles.Count - 1; i >= 0; i--)
+        {
+            if (piles[i].root == null)
+            {
+                // Root gone — drop stale body refs.
+                piles.RemoveAt(i);
+                continue;
+            }
+            n += CountValid(piles[i].bodies);
+        }
+        cachedLive = n;
     }
 
     static int CountValid(List<Rigidbody> bodies)
     {
+        if (bodies == null) return 0;
         int n = 0;
         for (int i = 0; i < bodies.Count; i++)
             if (bodies[i] != null) n++;
         return n;
+    }
+
+    static void DestroyImmediateSafe(Object obj)
+    {
+        if (obj == null) return;
+        if (Application.isPlaying)
+            Object.DestroyImmediate(obj);
+        else
+            Object.DestroyImmediate(obj);
     }
 }

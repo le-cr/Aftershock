@@ -6,8 +6,11 @@ using UnityEngine;
 /// thaws under shelter, so damage escalates rather than ticking flat. Snow settles on the
 /// ground over the course of the storm. Wind howls, louder in gusts.
 ///
-/// Snow particles physically collide with the world (so a shelter roof actually blocks them),
-/// and the player counts as exposed only while snow is still landing on them.
+/// Exposure is decided two ways, either of which counts: an upward cover check (nothing solid
+/// between the player's head and the sky), and snow particles physically landing on them. The
+/// particles collide with the world, so a roof blocks them, but an open-sided lean-to still leaks
+/// when the wind drives snow in sideways. Once the player is hypothermic, cover alone no longer
+/// stops the damage: they keep losing health until they have thawed below the threshold.
 /// </summary>
 [RequireComponent(typeof(ParticleSystem))]
 public class BlizzardManager : MonoBehaviour
@@ -15,16 +18,32 @@ public class BlizzardManager : MonoBehaviour
     [Header("Exposure")]
     [Tooltip("How long the player stays 'in the snow' after the last particle hit. " +
              "Acts as a grace period so stepping under a roof clears exposure.")]
-    [SerializeField] float exposureGraceSeconds = 0.5f;
+    [SerializeField] float exposureGraceSeconds = 1f;
+
+    [Tooltip("The player is under cover when a collider blocks the sky within this height above their head. " +
+             "Rays also lean into the wind, so a roof has to actually shield the windward side.")]
+    [SerializeField] float coverCheckHeight = 40f;
+
+    [Tooltip("Layers that count as cover. Triggers are always ignored.")]
+    [SerializeField] LayerMask coverMask = ~0;
 
     [Tooltip("Seconds of continuous exposure to reach full cold.")]
-    [SerializeField] float secondsToFreeze = 50f;
+    [SerializeField] float secondsToFreeze = 60f;
 
     [Tooltip("Seconds under shelter to thaw from full cold back to none.")]
-    [SerializeField] float secondsToThaw = 20f;
+    [SerializeField] float secondsToThaw = 30f;
 
     [Tooltip("Hazard damage multiplier at zero cold and at full cold.")]
-    [SerializeField] Vector2 damageMultiplierRange = new Vector2(0.4f, 2.2f);
+    [SerializeField] Vector2 damageMultiplierRange = new Vector2(0.15f, 1.2f);
+
+    [Tooltip("Cold level above which the player is hypothermic: damage continues under cover, " +
+             "scaled by hypothermiaCoverDamageScale, until they thaw back below this.")]
+    [Range(0f, 1f)]
+    [SerializeField] float hypothermiaThreshold = 0.75f;
+
+    [Tooltip("Fraction of the normal damage rate a hypothermic player still takes under cover.")]
+    [Range(0f, 1f)]
+    [SerializeField] float hypothermiaCoverDamageScale = 0.4f;
 
     [Header("Wind")]
     [Tooltip("Steady wind speed in m/s.")]
@@ -34,7 +53,7 @@ public class BlizzardManager : MonoBehaviour
     [SerializeField] float gustWind = 14f;
 
     [Tooltip("How much of the wind speed becomes player push (m/s per m/s of wind).")]
-    [SerializeField] float playerPushFactor = 0.11f;
+    [SerializeField] float playerPushFactor = 0.12f;
 
     [Tooltip("Fog distances are multiplied by this at the height of a gust (whiteout).")]
     [Range(0.1f, 1f)]
@@ -42,7 +61,15 @@ public class BlizzardManager : MonoBehaviour
 
     [Header("Snow")]
     [Tooltip("Snow particles per second in still air and at full gust.")]
-    [SerializeField] Vector2 emissionRange = new Vector2(600f, 1600f);
+    [SerializeField] Vector2 emissionRange = new Vector2(900f, 2000f);
+
+    [Tooltip("Metres above the player the snow is emitted from. Kept low so the snow reaches the " +
+             "ground well inside its lifetime and lands densely enough to register hits.")]
+    [SerializeField] float emitterHeight = 14f;
+
+    [Tooltip("Mean downward speed of the snow in m/s: emitter start speed plus the velocity-over-lifetime " +
+             "fall. Used to place the emitter upwind so the snow lands on the player rather than past them.")]
+    [SerializeField] float meanFallSpeed = 6.5f;
 
     [Tooltip("Seconds of storm for the ground to turn fully white.")]
     [SerializeField] float secondsToCoverGround = 100f;
@@ -68,9 +95,14 @@ public class BlizzardManager : MonoBehaviour
     private Material terrainRuntimeMaterial;
     private Material terrainOriginalMaterial;
     private Color terrainOriginalColor;
-    private Vector3 emitterOffset;
+    private bool underCover = true;
+    private bool hypothermic;
+    private readonly RaycastHit[] coverHits = new RaycastHit[8];
 
     public float Cold => cold;
+    public bool UnderCover => underCover;
+    public bool Hypothermic => hypothermic;
+    public bool Exposed { get; private set; }
     public float Gust => gust;
     public Vector3 Wind => wind;
 
@@ -87,8 +119,6 @@ public class BlizzardManager : MonoBehaviour
         if (terrain == null)
             terrain = FindFirstObjectByType<Terrain>();
 
-        // The emitter was authored at a fixed height above the map; keep that height but follow the player.
-        emitterOffset = new Vector3(0f, transform.position.y, 0f);
         windHeading = Random.Range(0f, 360f);
     }
 
@@ -96,6 +126,8 @@ public class BlizzardManager : MonoBehaviour
     {
         startTime = Time.time;
         cold = 0f;
+        hypothermic = false;
+        Exposed = false;
 
         if (windLoop == null)
             windLoop = ProceduralAudio.AddLoop(gameObject, ProceduralAudio.Wind());
@@ -173,15 +205,29 @@ public class BlizzardManager : MonoBehaviour
 
     private void UpdateExposure()
     {
-        bool exposed = Time.time - lastSnowHitTime < exposureGraceSeconds;
-        playerController.touchingSnow = exposed;
+        bool snowHit = Time.time - lastSnowHitTime < exposureGraceSeconds;
+        underCover = HasOverheadCover();
+        bool exposed = !underCover || snowHit;
+        Exposed = exposed;
 
         // Cold builds in the open and thaws under cover.
         cold = exposed
             ? Mathf.MoveTowards(cold, 1f, Time.deltaTime / Mathf.Max(secondsToFreeze, 0.1f))
             : Mathf.MoveTowards(cold, 0f, Time.deltaTime / Mathf.Max(secondsToThaw, 0.1f));
 
-        playerController.HazardDamageMultiplier = Mathf.Lerp(damageMultiplierRange.x, damageMultiplierRange.y, cold);
+        // Hypothermia latches on at the threshold and only lets go once well below it, so the
+        // damage doesn't flicker on and off right at the line.
+        if (cold >= hypothermiaThreshold)
+            hypothermic = true;
+        else if (cold < hypothermiaThreshold - 0.25f)
+            hypothermic = false;
+
+        float multiplier = Mathf.Lerp(damageMultiplierRange.x, damageMultiplierRange.y, cold);
+        if (!exposed && hypothermic)
+            multiplier *= hypothermiaCoverDamageScale;
+
+        playerController.touchingSnow = exposed || hypothermic;
+        playerController.HazardDamageMultiplier = multiplier;
 
         if (coldTint != null)
             coldTint.SetSustained(cold);
@@ -197,13 +243,50 @@ public class BlizzardManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// True when something solid sits between the player's head and the sky. Three rays: one
+    /// straight up and two leaning into the wind, so cover has to shield the windward side too.
+    /// </summary>
+    private bool HasOverheadCover()
+    {
+        var cc = playerController.GetComponent<CharacterController>();
+        float top = cc != null ? cc.center.y + cc.height * 0.5f : 1.8f;
+        Vector3 origin = playerController.transform.position + Vector3.up * (top + 0.15f);
+
+        Vector3 horizontalWind = new Vector3(wind.x, 0f, wind.z);
+        Vector3 into = horizontalWind.sqrMagnitude > 0.01f ? -horizontalWind.normalized : Vector3.zero;
+
+        return CoverRay(origin, Vector3.up)
+            && CoverRay(origin, (Vector3.up + into * 0.35f).normalized)
+            && CoverRay(origin, (Vector3.up + into * 0.7f).normalized);
+    }
+
+    private bool CoverRay(Vector3 origin, Vector3 direction)
+    {
+        int count = Physics.RaycastNonAlloc(origin, direction, coverHits, coverCheckHeight, coverMask, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            var hit = coverHits[i];
+            if (hit.collider == null)
+                continue;
+            // Never let the player's own colliders count as a roof.
+            if (hit.collider.GetComponentInParent<PlayerController>() != null)
+                continue;
+            return true;
+        }
+        return false;
+    }
+
     private void UpdateSnow()
     {
         // Follow the player so the storm is everywhere they go, not a fixed patch of map. The
-        // emitter sits upwind, so wind-driven snow arrives at the player instead of leaving them.
+        // emitter sits upwind by the distance the snow drifts while it falls, so wind-driven
+        // snow lands on the player instead of sailing past them.
         var p = playerController.transform.position;
-        var upwind = -new Vector3(wind.x, 0f, wind.z).normalized * Mathf.Min(wind.magnitude * 2f, 30f);
-        transform.position = new Vector3(p.x + upwind.x, emitterOffset.y, p.z + upwind.z);
+        float fallTime = emitterHeight / Mathf.Max(meanFallSpeed, 0.5f);
+        var drift = new Vector3(wind.x, 0f, wind.z) * fallTime;
+        var upwind = -Vector3.ClampMagnitude(drift, 80f);
+        transform.position = new Vector3(p.x + upwind.x, p.y + emitterHeight, p.z + upwind.z);
 
         var emission = ps.emission;
         emission.rateOverTime = Mathf.Lerp(emissionRange.x, emissionRange.y, gust);
@@ -214,7 +297,7 @@ public class BlizzardManager : MonoBehaviour
         vel.enabled = true;
         vel.space = ParticleSystemSimulationSpace.World;
         vel.x = new ParticleSystem.MinMaxCurve(wind.x * 0.7f, wind.x * 1.3f);
-        vel.y = new ParticleSystem.MinMaxCurve(-2f, -1f);
+        vel.y = new ParticleSystem.MinMaxCurve(-3f, -2f);
         vel.z = new ParticleSystem.MinMaxCurve(wind.z * 0.7f, wind.z * 1.3f);
 
         if (terrainRuntimeMaterial != null && terrainRuntimeMaterial.HasProperty("_BaseColor"))

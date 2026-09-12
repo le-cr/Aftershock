@@ -51,18 +51,18 @@ public class WildfireManager : MonoBehaviour
 
     [Header("Spread")]
     [Tooltip("Seconds a single cell burns before going out and freeing its VFX slot.")]
-    [SerializeField] float cellBurnSeconds = 14f;
+    [SerializeField] float cellBurnSeconds = 20f;
 
     [Tooltip("Fraction of the survival window by which the furthest cell has ignited. " +
              "Spread speed is derived from this, so the fire always paces itself to the run length.")]
     [Range(0.5f, 1f)]
-    [SerializeField] float spreadCompletionFraction = 0.9f;
+    [SerializeField] float spreadCompletionFraction = 0.75f;
 
     [Tooltip("Metres of random ignition delay per cell, so the front reads organically.")]
     [SerializeField] float ignitionJitter = 4f;
 
     [Tooltip("Fire ignites at least this far from the player, so it starts beside them not on them.")]
-    [SerializeField] float minOriginDistanceFromPlayer = 8f;
+    [SerializeField] float minOriginDistanceFromPlayer = 6f;
 
     [Header("Wind")]
     [Tooltip("How strongly wind stretches the front downwind. 0 = a circle, 0.5 = downwind cells ignite " +
@@ -87,20 +87,20 @@ public class WildfireManager : MonoBehaviour
 
     [Header("Damage")]
     [Tooltip("Damage stops entirely beyond this distance from the nearest burning cell.")]
-    [SerializeField] float damageRadius = 9f;
+    [SerializeField] float damageRadius = 12f;
 
     [Tooltip("Health lost per second when standing in the middle of a fire. Health runs 0-1.")]
-    [SerializeField] float maxDamagePerSecond = 0.2f;
+    [SerializeField] float maxDamagePerSecond = 0.3f;
 
     [Header("Buildings")]
     [Tooltip("The front ignites a building once it comes this close to it.")]
-    [SerializeField] float buildingIgniteRadius = 10f;
+    [SerializeField] float buildingIgniteRadius = 14f;
 
     [Tooltip("Seconds a building burns before its fire goes out. The building itself is untouched.")]
     [SerializeField] float buildingBurnSeconds = 20f;
 
     [Tooltip("Hard ceiling on buildings alight at once. Buildings the front reaches while full wait their turn.")]
-    [SerializeField] int maxConcurrentBuildingFires = 4;
+    [SerializeField] int maxConcurrentBuildingFires = 6;
 
     [Tooltip("Leave empty to burn every BuildingCollapse in the scene.")]
     [SerializeField] BuildingCollapse[] buildings;

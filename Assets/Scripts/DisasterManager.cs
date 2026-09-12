@@ -55,11 +55,14 @@ public class DisasterManager : MonoBehaviour
         if (atmosphere == null)
             atmosphere = FindFirstObjectByType<DisasterAtmosphere>();
 
-        ApplyPlayerSettings();
+        // Menu Play arms overrides; playing Main directly keeps Inspector constants.
+        if (GameSettings.MenuOverridesArmed)
+            ApplyMenuSettings();
     }
 
     void Start()
     {
+        // Music volume always comes from saved settings (menu or prior session).
         GameSettings.ApplyAudioVolume();
 
         chosenDisaster = overrideRandomPick
@@ -70,10 +73,10 @@ public class DisasterManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Pull prep / survive times and disaster choice from the main-menu settings.
-    /// A Random choice leaves the Inspector override alone (random pick).
+    /// Apply prep / survive times and disaster choice from the main-menu settings.
+    /// Only called when the run was started from the title screen.
     /// </summary>
-    void ApplyPlayerSettings()
+    void ApplyMenuSettings()
     {
         warningSeconds = GameSettings.PrepSeconds;
         surviveSeconds = GameSettings.SurviveSeconds;

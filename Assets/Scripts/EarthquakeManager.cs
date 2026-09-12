@@ -6,7 +6,9 @@ using UnityEngine;
 /// Runs the earthquake for the whole survival window. A short foreshock rattles first, then the
 /// main shock, then aftershocks that come less often and weaker as time goes on (Omori's law),
 /// with the occasional big one. Buildings are held back rather than all dropped at once, and
-/// only tremors strong enough bring one down.
+/// only tremors strong enough bring one down. Collapses favour the buildings nearest the
+/// player, a building coming down beside them hurts in itself, and while the ground shakes
+/// the facades of nearby buildings shed chunks that fall towards the player.
 ///
 /// While the ground shakes: a low rumble scaled to the shaking, dust lifts off the ground around
 /// the player, the player stumbles, and each collapse throws up a burst of dust.
@@ -30,12 +32,54 @@ public class EarthquakeManager : MonoBehaviour
     [Tooltip("Buildings brought down by the main shock.")]
     [SerializeField] int initialCollapseCount = 4;
 
+    [Header("Targeting")]
+    [Tooltip("Chance each collapse takes the building nearest the player; otherwise one of the nearest few.")]
+    [Range(0f, 1f)]
+    [SerializeField] float nearestCollapseChance = 0.6f;
+
+    [Tooltip("How many of the nearest standing buildings a non-nearest collapse is drawn from.")]
+    [SerializeField] int nearestPoolSize = 4;
+
+    [Header("Collapse damage")]
+    [Tooltip("Health lost when a building collapses with the player right against it. Falls off to nothing at collapseDamageRadius.")]
+    [SerializeField] float collapseDamage = 0.35f;
+
+    [Tooltip("Metres from the building's footprint within which a collapse hurts the player.")]
+    [SerializeField] float collapseDamageRadius = 12f;
+
+    [Header("Facade debris")]
+    [Tooltip("Chunks per second shed at full shake from the standing buildings nearest the player.")]
+    [SerializeField] float facadeDebrisPerSecond = 4f;
+
+    [Tooltip("Shake intensity (0-1 of the main shock) below which no facade debris falls.")]
+    [Range(0f, 1f)]
+    [SerializeField] float facadeDebrisShakeThreshold = 0.2f;
+
+    [Tooltip("Only buildings whose footprint is within this many metres of the player shed chunks.")]
+    [SerializeField] float facadeDebrisRadius = 20f;
+
+    [Tooltip("Chunk size range in metres.")]
+    [SerializeField] Vector2 facadeChunkSize = new Vector2(0.45f, 0.95f);
+
+    [Tooltip("Health lost when a facade chunk hits the player.")]
+    [SerializeField] float facadeChunkDamage = 0.12f;
+
+    [Tooltip("How closely chunks are aimed at the player: 0 = straight down, 1 = dead on.")]
+    [Range(0f, 1f)]
+    [SerializeField] float facadeChunkAim = 0.7f;
+
+    [Tooltip("Seconds a chunk lives before it is destroyed.")]
+    [SerializeField] float facadeChunkLifetime = 8f;
+
+    [Tooltip("Hard cap on live facade chunks.")]
+    [SerializeField] int maxFacadeChunks = 24;
+
     [Header("Aftershocks")]
     [Tooltip("Gap before the first aftershock, in seconds. Later gaps grow from here.")]
-    [SerializeField] float firstInterval = 8f;
+    [SerializeField] float firstInterval = 6f;
 
     [Tooltip("Each successive gap grows by this fraction (Omori decay of aftershock rate).")]
-    [SerializeField] float intervalGrowth = 0.22f;
+    [SerializeField] float intervalGrowth = 0.15f;
 
     [Tooltip("Fallback quake window when triggered without an explicit duration. DisasterManager passes the survival time instead.")]
     [SerializeField] float defaultDuration = 120f;
@@ -49,15 +93,15 @@ public class EarthquakeManager : MonoBehaviour
 
     [Tooltip("Chance any aftershock is a big one, nearly as strong as the main shock.")]
     [Range(0f, 1f)]
-    [SerializeField] float bigAftershockChance = 0.28f;
+    [SerializeField] float bigAftershockChance = 0.4f;
 
     [Tooltip("An aftershock must reach this fraction of the main shock to bring a building down.")]
     [Range(0f, 1f)]
-    [SerializeField] float collapseThreshold = 0.35f;
+    [SerializeField] float collapseThreshold = 0.3f;
 
     [Header("Feel")]
     [Tooltip("Horizontal stumble pushed onto the player per metre of shake, in m/s.")]
-    [SerializeField] float stumblePerMetre = 5.5f;
+    [SerializeField] float stumblePerMetre = 7f;
 
     [Tooltip("Dust particles per second around the player at full shake.")]
     [SerializeField] float dustRateAtFullShake = 90f;
@@ -92,6 +136,12 @@ public class EarthquakeManager : MonoBehaviour
     private ParticleSystem dust;
     private float stumbleSeed;
     private float currentShake;      // 0-1 of main-shock magnitude, this frame
+    private float facadeDebrisAccumulator;
+    private Transform facadeRoot;
+    private readonly List<GameObject> facadeChunks = new List<GameObject>();
+    private readonly List<BuildingCollapse> nearbyBuildings = new List<BuildingCollapse>();
+
+    public int FacadeChunkCount => facadeChunks.Count;
 
     public bool HasTriggered => triggered;
 
@@ -201,7 +251,7 @@ public class EarthquakeManager : MonoBehaviour
             ShakeAll(aftershockShakeDuration * Mathf.Lerp(0.75f, 1.4f, scale), shakeMagnitude * scale);
 
             if (scale >= collapseThreshold)
-                yield return CollapseNext(bigOne ? 2 : 1);
+                yield return CollapseNext(bigOne ? 3 : 1);
         }
     }
 
@@ -242,6 +292,149 @@ public class EarthquakeManager : MonoBehaviour
         // Air fills with dust as the quake wears on.
         if (atmosphere != null)
             atmosphere.SetIntensity(Mathf.Clamp01((buildings.Length - standing.Count) / Mathf.Max(buildings.Length, 1f)), 12f);
+
+        UpdateFacadeDebris();
+    }
+
+    /// <summary>
+    /// While the ground shakes, the standing buildings nearest the player shed chunks from their
+    /// rooflines that fall towards them. Standing beside a building is the dangerous place to be.
+    /// </summary>
+    private void UpdateFacadeDebris()
+    {
+        facadeChunks.RemoveAll(c => c == null);
+
+        if (playerController == null || currentShake < facadeDebrisShakeThreshold)
+        {
+            facadeDebrisAccumulator = 0f;
+            return;
+        }
+
+        float shake = Mathf.InverseLerp(facadeDebrisShakeThreshold, 1f, currentShake);
+        facadeDebrisAccumulator += facadeDebrisPerSecond * shake * Time.deltaTime;
+        if (facadeDebrisAccumulator < 1f)
+            return;
+        facadeDebrisAccumulator -= 1f;
+
+        if (facadeChunks.Count >= maxFacadeChunks)
+            return;
+
+        var player = playerController.transform.position;
+        nearbyBuildings.Clear();
+        foreach (var b in standing)
+        {
+            if (b == null || b.HasCollapsed || !b.gameObject.activeInHierarchy)
+                continue;
+            if (FootprintDistance(b, player) <= facadeDebrisRadius)
+                nearbyBuildings.Add(b);
+        }
+        if (nearbyBuildings.Count == 0)
+            return;
+
+        SpawnFacadeChunk(nearbyBuildings[Random.Range(0, nearbyBuildings.Count)], player);
+    }
+
+    private void SpawnFacadeChunk(BuildingCollapse building, Vector3 player)
+    {
+        var renderer = building.GetComponent<Renderer>();
+        if (renderer == null)
+            return;
+        var bounds = renderer.bounds;
+
+        // Shed from the roofline on the side facing the player, so the chunk clears the wall.
+        var edge = bounds.ClosestPoint(new Vector3(player.x, bounds.max.y, player.z));
+        var outward = new Vector3(edge.x - bounds.center.x, 0f, edge.z - bounds.center.z);
+        if (outward.sqrMagnitude < 0.01f)
+            outward = new Vector3(player.x - bounds.center.x, 0f, player.z - bounds.center.z);
+        outward = outward.sqrMagnitude > 0.01f ? outward.normalized : Vector3.forward;
+
+        float size = Random.Range(facadeChunkSize.x, facadeChunkSize.y);
+        var spawn = new Vector3(edge.x, bounds.max.y + size, edge.z)
+            + outward * (size * 0.75f + 0.4f)
+            + Vector3.Cross(outward, Vector3.up) * Random.Range(-2.5f, 2.5f);
+
+        if (facadeRoot == null)
+            facadeRoot = new GameObject("FacadeDebris").transform;
+
+        var chunk = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        chunk.name = "FacadeChunk";
+        chunk.transform.SetParent(facadeRoot, true);
+        chunk.transform.position = spawn;
+        chunk.transform.rotation = Random.rotation;
+        chunk.transform.localScale = new Vector3(size, size * Random.Range(0.5f, 1f), size * Random.Range(0.6f, 1f));
+
+        var mr = chunk.GetComponent<MeshRenderer>();
+        mr.sharedMaterial = renderer.sharedMaterial;
+        mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+        var rb = chunk.AddComponent<Rigidbody>();
+        rb.mass = 40f * size;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+        rb.angularVelocity = Random.insideUnitSphere * 4f;
+
+        // Aim: the horizontal speed that would land the chunk on the player, blended with a plain drop.
+        float drop = Mathf.Max(spawn.y - player.y, 1f);
+        float fallTime = Mathf.Sqrt(2f * drop / Mathf.Abs(Physics.gravity.y));
+        var toPlayer = new Vector3(player.x - spawn.x, 0f, player.z - spawn.z) / fallTime;
+        var scatter = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
+        rb.linearVelocity = Vector3.Lerp(outward * 1.5f, toPlayer, facadeChunkAim) + scatter;
+
+        chunk.AddComponent<DebrisDamage>().Configure(facadeChunkDamage, 1.5f, 0.3f);
+
+        Destroy(chunk, facadeChunkLifetime);
+        facadeChunks.Add(chunk);
+    }
+
+    /// <summary>Horizontal distance from a point to a building's footprint (0 when inside it).</summary>
+    private static float FootprintDistance(BuildingCollapse building, Vector3 point)
+    {
+        var renderer = building.GetComponent<Renderer>();
+        if (renderer == null)
+            return Vector3.Distance(building.transform.position, point);
+        var b = renderer.bounds;
+        var closest = b.ClosestPoint(new Vector3(point.x, Mathf.Clamp(point.y, b.min.y, b.max.y), point.z));
+        return Vector2.Distance(new Vector2(closest.x, closest.z), new Vector2(point.x, point.z));
+    }
+
+    /// <summary>
+    /// Pull the next building to collapse out of the standing list: usually the one nearest the
+    /// player, otherwise one of the nearest few, so debris actually reaches them.
+    /// </summary>
+    private BuildingCollapse TakeNextBuilding()
+    {
+        standing.RemoveAll(b => b == null);
+        if (standing.Count == 0)
+            return null;
+
+        if (playerController == null)
+        {
+            var first = standing[0];
+            standing.RemoveAt(0);
+            return first;
+        }
+
+        var player = playerController.transform.position;
+        standing.Sort((a, b) => FootprintDistance(a, player).CompareTo(FootprintDistance(b, player)));
+
+        int index = Random.value < nearestCollapseChance
+            ? 0
+            : Random.Range(0, Mathf.Min(Mathf.Max(nearestPoolSize, 1), standing.Count));
+        var pick = standing[index];
+        standing.RemoveAt(index);
+        return pick;
+    }
+
+    /// <summary>A building coming down right beside the player hurts, falling off with distance.</summary>
+    private void ApplyCollapseDamage(BuildingCollapse building)
+    {
+        if (playerController == null || collapseDamage <= 0f)
+            return;
+
+        float d = FootprintDistance(building, playerController.transform.position);
+        if (d >= collapseDamageRadius)
+            return;
+
+        playerController.TakeDamage(collapseDamage * (1f - d / collapseDamageRadius));
     }
 
     private void ShakeAll(float duration, float magnitude)
@@ -258,18 +451,39 @@ public class EarthquakeManager : MonoBehaviour
     {
         for (int i = 0; i < count && standing.Count > 0; i++)
         {
-            var building = standing[0];
-            standing.RemoveAt(0);
+            // Wait for fragment budget headroom instead of fracturing into an already-full sim.
+            var budget = DebrisBudget.Ensure();
+            int spins = 0;
+            while (budget.IsFull && spins++ < 40)
+            {
+                yield return new WaitForSeconds(0.25f);
+                budget = DebrisBudget.Ensure();
+            }
+            if (budget.IsFull || !budget.CanCollapse())
+                yield break;
+
+            var building = TakeNextBuilding();
 
             if (building == null)
+                continue;
+
+            // Collapse() may no-op if the budget filled between the check and the call.
+            if (building.HasCollapsed)
                 continue;
 
             var renderer = building.GetComponent<Renderer>();
             var at = renderer != null ? renderer.bounds : new Bounds(building.transform.position, Vector3.one * 6f);
 
             building.Collapse();
-            BurstDust(at);
+            if (!building.HasCollapsed)
+            {
+                // Budget refused — put it back and stop trying this tremor.
+                standing.Insert(0, building);
+                yield break;
+            }
 
+            ApplyCollapseDamage(building);
+            BurstDust(at);
             yield return new WaitForSeconds(collapseStagger);
         }
     }
@@ -299,5 +513,11 @@ public class EarthquakeManager : MonoBehaviour
     {
         if (fpc != null)
             fpc.ExternalVelocity = Vector3.zero;
+    }
+
+    void OnDestroy()
+    {
+        if (facadeRoot != null)
+            Destroy(facadeRoot.gameObject);
     }
 }

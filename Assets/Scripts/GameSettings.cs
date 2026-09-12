@@ -3,6 +3,10 @@ using UnityEngine;
 /// <summary>
 /// Persistent player options shared by the main menu and a run of Main.
 /// Disaster choice of Random leaves <see cref="DisasterManager"/> to pick at runtime.
+///
+/// Menu values only override <see cref="DisasterManager"/> Inspector constants when a run is
+/// started with <see cref="ArmMenuOverrides"/> (Play from the title screen). Playing Main
+/// directly in the Editor uses the Inspector values as authored.
 /// </summary>
 public static class GameSettings
 {
@@ -28,6 +32,16 @@ public static class GameSettings
     public const float MaxPrepSeconds = 120f;
     public const float MinSurviveSeconds = 30f;
     public const float MaxSurviveSeconds = 300f;
+
+    /// <summary>
+    /// When true, <see cref="DisasterManager"/> should apply menu prep/survive/disaster values
+    /// over its Inspector constants. Armed by the title-screen Play button.
+    /// </summary>
+    public static bool MenuOverridesArmed { get; private set; }
+
+    public static void ArmMenuOverrides() => MenuOverridesArmed = true;
+
+    public static void ClearMenuOverrides() => MenuOverridesArmed = false;
 
     public static DisasterChoice Disaster
     {

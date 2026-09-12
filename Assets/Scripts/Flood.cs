@@ -20,14 +20,14 @@ public class Flood : MonoBehaviour
     [SerializeField] Material rainMaterial;
 
     [Header("Rise")]
-    [SerializeField] float floodSpeed = 0.5f;
+    [SerializeField] float floodSpeed = 0.65f;
     [SerializeField] float maxFloodHeight = 10f;
 
     [Tooltip("The rise accelerates by this factor over the flood's life, so it starts gentle and ends urgent.")]
-    [SerializeField] float endSpeedMultiplier = 2.5f;
+    [SerializeField] float endSpeedMultiplier = 3f;
 
     [Tooltip("Seconds over which the rise ramps from base speed to base speed x endSpeedMultiplier.")]
-    [SerializeField] float rampSeconds = 90f;
+    [SerializeField] float rampSeconds = 70f;
 
     [Tooltip("How much the rise speed swells and lulls in surges. 0 = steady, 1 = up to double / down to nothing.")]
     [Range(0f, 1f)]
@@ -38,7 +38,7 @@ public class Flood : MonoBehaviour
 
     [Header("Water")]
     [Tooltip("Metres per second the current carries a fully submerged player.")]
-    [SerializeField] float currentStrength = 1.4f;
+    [SerializeField] float currentStrength = 2f;
 
     [Tooltip("Seconds it takes the current to swing to a new heading.")]
     [SerializeField] float currentWanderSeconds = 25f;

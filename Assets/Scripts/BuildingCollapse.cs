@@ -17,7 +17,7 @@ public class BuildingCollapse : MonoBehaviour
 
     [Header("Separation")]
     [Tooltip("Outward impulse applied to every fragment from the blast origin.")]
-    public float explosionForce = 6.5f;
+    public float explosionForce = 10f;
 
     [Tooltip("Radius of the blast. Fragments further than this from the origin get no impulse.")]
     public float explosionRadius = 28f;
@@ -30,7 +30,7 @@ public class BuildingCollapse : MonoBehaviour
     public float blastHeightFraction = 0.05f;
 
     [Tooltip("Extra sideways scatter applied to a fragment at the roof. Base fragments get none, so the building splays outward as it comes down.")]
-    public float lateralScatter = 2.2f;
+    public float lateralScatter = 3f;
 
     [Tooltip("Random spin applied to each fragment.")]
     public float randomTorque = 2f;
@@ -44,10 +44,10 @@ public class BuildingCollapse : MonoBehaviour
 
     [Header("Damage")]
     [Tooltip("Health removed when a fragment strikes the player. Health runs 0-1.")]
-    public float debrisDamage = 0.2f;
+    public float debrisDamage = 0.3f;
 
     [Tooltip("Minimum impact speed before a fragment hurts. Stops resting rubble from grinding the player down.")]
-    public float debrisMinImpactSpeed = 1.8f;
+    public float debrisMinImpactSpeed = 1.2f;
 
     [Tooltip("Seconds before the same fragment can hurt the player again.")]
     public float debrisRearmSeconds = 0.35f;
@@ -57,10 +57,10 @@ public class BuildingCollapse : MonoBehaviour
     public bool despawnFragments = true;
 
     [Tooltip("Seconds before the rubble is destroyed, if despawning is enabled.")]
-    public float fragmentLifetime = 28f;
+    public float fragmentLifetime = 18f;
 
     [Tooltip("Seconds of ContinuousSpeculative collision while debris is flying, then Discrete.")]
-    public float speculativeSeconds = 2.5f;
+    public float speculativeSeconds = 1.25f;
 
     bool collapsed;
 
@@ -79,6 +79,13 @@ public class BuildingCollapse : MonoBehaviour
     public void Collapse()
     {
         if (collapsed) return;
+
+        var budget = DebrisBudget.Ensure();
+        // Hard stop: never fracture another building while the fragment cap is full.
+        // Causing a Fracture allocates meshes + convex MeshColliders before any cull can run.
+        if (budget.IsFull || !budget.CanCollapse())
+            return;
+
         collapsed = true;
 
         // Cache the bounds before fracturing; the source object is deactivated by CauseFracture.

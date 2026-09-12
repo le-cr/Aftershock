@@ -9,10 +9,10 @@ public class PlayerController : MonoBehaviour
 
     [Header("Hazard damage")]
     [Tooltip("Health lost per second while exposed to snow or water. Health runs 0-1.")]
-    [SerializeField] float hazardDamagePerSecond = 0.05f;
+    [SerializeField] float hazardDamagePerSecond = 0.06f;
 
     [Tooltip("Multiplier on hazard damage once the head is under water.")]
-    [SerializeField] float drowningMultiplier = 3f;
+    [SerializeField] float drowningMultiplier = 4f;
 
     [Tooltip("Submersion (0-1) above which the player is drowning rather than wading.")]
     [SerializeField] float drownSubmersion = 0.97f;
@@ -28,10 +28,10 @@ public class PlayerController : MonoBehaviour
 
     [Header("Regeneration")]
     [Tooltip("Seconds without taking damage before health starts regenerating.")]
-    [SerializeField] float regenDelaySeconds = 6f;
+    [SerializeField] float regenDelaySeconds = 9f;
 
     [Tooltip("Health regained per second once regeneration kicks in.")]
-    [SerializeField] float regenPerSecond = 0.03f;
+    [SerializeField] float regenPerSecond = 0.02f;
 
     [Header("Environmental slow")]
     [Tooltip("Move-speed multiplier while wading through water or exposed to blizzard snow.")]
