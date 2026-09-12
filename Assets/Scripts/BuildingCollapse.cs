@@ -4,6 +4,9 @@ using UnityEngine;
 /// Drives an OpenFracture <see cref="Fracture"/> component from a key press and then throws the
 /// resulting fragments apart, so the building reads as a collapsing structure rather than a mesh
 /// that quietly falls into a neat pile.
+///
+/// Fragments are registered with <see cref="DebrisBudget"/> so the physics step stays bounded
+/// even when many buildings come down during a long earthquake.
 /// </summary>
 [RequireComponent(typeof(Fracture))]
 public class BuildingCollapse : MonoBehaviour
@@ -14,47 +17,50 @@ public class BuildingCollapse : MonoBehaviour
 
     [Header("Separation")]
     [Tooltip("Outward impulse applied to every fragment from the blast origin.")]
-    public float explosionForce = 3.5f;
+    public float explosionForce = 6.5f;
 
     [Tooltip("Radius of the blast. Fragments further than this from the origin get no impulse.")]
-    public float explosionRadius = 25f;
+    public float explosionRadius = 28f;
 
     [Tooltip("Metres the blast origin is pushed below the building, which adds lift to the debris.")]
-    public float upwardsModifier = 0.5f;
+    public float upwardsModifier = 0.65f;
 
     [Tooltip("Height of the blast origin as a fraction of the building height. 0 = base, 1 = roof.")]
     [Range(0f, 1f)]
     public float blastHeightFraction = 0.05f;
 
     [Tooltip("Extra sideways scatter applied to a fragment at the roof. Base fragments get none, so the building splays outward as it comes down.")]
-    public float lateralScatter = 1.2f;
+    public float lateralScatter = 2.2f;
 
     [Tooltip("Random spin applied to each fragment.")]
-    public float randomTorque = 1.2f;
+    public float randomTorque = 2f;
 
     [Header("Settling")]
     [Tooltip("Linear damping on the fragments so the pile settles instead of skating.")]
-    public float fragmentDrag = 0.15f;
+    public float fragmentDrag = 0.35f;
 
     [Tooltip("Angular damping on the fragments.")]
-    public float fragmentAngularDrag = 1.5f;
+    public float fragmentAngularDrag = 2.5f;
 
     [Header("Damage")]
     [Tooltip("Health removed when a fragment strikes the player. Health runs 0-1.")]
-    public float debrisDamage = 0.08f;
+    public float debrisDamage = 0.2f;
 
     [Tooltip("Minimum impact speed before a fragment hurts. Stops resting rubble from grinding the player down.")]
-    public float debrisMinImpactSpeed = 2.5f;
+    public float debrisMinImpactSpeed = 1.8f;
 
     [Tooltip("Seconds before the same fragment can hurt the player again.")]
-    public float debrisRearmSeconds = 0.5f;
+    public float debrisRearmSeconds = 0.35f;
 
     [Header("Cleanup")]
     [Tooltip("Destroy the rubble after it has settled.")]
-    public bool despawnFragments = false;
+    public bool despawnFragments = true;
 
     [Tooltip("Seconds before the rubble is destroyed, if despawning is enabled.")]
-    public float fragmentLifetime = 30f;
+    public float fragmentLifetime = 28f;
+
+    [Tooltip("Seconds of ContinuousSpeculative collision while debris is flying, then Discrete.")]
+    public float speculativeSeconds = 2.5f;
 
     bool collapsed;
 
@@ -88,10 +94,7 @@ public class BuildingCollapse : MonoBehaviour
         if (fragmentRoot != null && fragmentRoot.childCount > 0)
         {
             Separate(fragmentRoot, bounds);
-            if (despawnFragments)
-            {
-                Destroy(fragmentRoot.gameObject, fragmentLifetime);
-            }
+            FinishPile(fragmentRoot);
             return;
         }
 
@@ -104,10 +107,20 @@ public class BuildingCollapse : MonoBehaviour
     internal void SeparateAndCleanUp(Transform fragmentRoot, Bounds bounds)
     {
         Separate(fragmentRoot, bounds);
+        FinishPile(fragmentRoot);
+    }
+
+    void FinishPile(Transform fragmentRoot)
+    {
+        DebrisBudget.Ensure().RegisterPile(fragmentRoot);
+
         if (despawnFragments)
-        {
             Destroy(fragmentRoot.gameObject, fragmentLifetime);
-        }
+
+        // Speculative continuous collision is expensive in a rubble pile; keep it only while
+        // chunks are still airborne and likely to tunnel through the player.
+        var scheduler = fragmentRoot.gameObject.AddComponent<FragmentCollisionDowngrade>();
+        scheduler.Begin(speculativeSeconds);
     }
 
     void Separate(Transform fragmentRoot, Bounds bounds)
@@ -126,6 +139,7 @@ public class BuildingCollapse : MonoBehaviour
             body.linearDamping = fragmentDrag;
             body.angularDamping = fragmentAngularDrag;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            body.maxDepenetrationVelocity = 5f;
 
             // Flying debris hurts. Attached here because this is where the fragment bodies
             // are first handled; they are created at runtime by the fracture.
@@ -211,5 +225,30 @@ class DeferredFragmentSeparator : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+}
+
+/// <summary>
+/// Downgrades fragment Rigidbodies from ContinuousSpeculative to Discrete after the flying
+/// phase, which is the main physics cost once rubble has hit the ground.
+/// </summary>
+class FragmentCollisionDowngrade : MonoBehaviour
+{
+    public void Begin(float delay)
+    {
+        StartCoroutine(Run(Mathf.Max(0.1f, delay)));
+    }
+
+    System.Collections.IEnumerator Run(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        foreach (var body in GetComponentsInChildren<Rigidbody>())
+        {
+            if (body == null) continue;
+            body.collisionDetectionMode = CollisionDetectionMode.Discrete;
+        }
+
+        Destroy(this);
     }
 }

@@ -16,54 +16,54 @@ public class EarthquakeManager : MonoBehaviour
 {
     [Header("Main shock")]
     [Tooltip("Seconds of faint pre-tremor before the main shock. Real quakes announce themselves with P-waves.")]
-    [SerializeField] float foreshockSeconds = 3f;
+    [SerializeField] float foreshockSeconds = 3.5f;
 
     [Tooltip("Seconds the camera shakes on the main shock. The shake decays to nothing over this time.")]
-    [SerializeField] float shakeDuration = 8f;
+    [SerializeField] float shakeDuration = 10f;
 
     [Tooltip("Peak camera offset in metres on the main shock.")]
-    [SerializeField] float shakeMagnitude = 0.35f;
+    [SerializeField] float shakeMagnitude = 0.62f;
 
     [Tooltip("Seconds of shaking before the first building gives way.")]
-    [SerializeField] float leadIn = 0.6f;
+    [SerializeField] float leadIn = 0.45f;
 
     [Tooltip("Buildings brought down by the main shock.")]
-    [SerializeField] int initialCollapseCount = 2;
+    [SerializeField] int initialCollapseCount = 4;
 
     [Header("Aftershocks")]
     [Tooltip("Gap before the first aftershock, in seconds. Later gaps grow from here.")]
-    [SerializeField] float firstInterval = 12f;
+    [SerializeField] float firstInterval = 8f;
 
     [Tooltip("Each successive gap grows by this fraction (Omori decay of aftershock rate).")]
-    [SerializeField] float intervalGrowth = 0.3f;
+    [SerializeField] float intervalGrowth = 0.22f;
 
     [Tooltip("Fallback quake window when triggered without an explicit duration. DisasterManager passes the survival time instead.")]
     [SerializeField] float defaultDuration = 120f;
 
     [Tooltip("Seconds an aftershock shakes for.")]
-    [SerializeField] float aftershockShakeDuration = 4f;
+    [SerializeField] float aftershockShakeDuration = 5f;
 
     [Tooltip("Typical aftershock strength as a fraction of the main shock, before decay and randomness.")]
     [Range(0f, 1f)]
-    [SerializeField] float aftershockMagnitudeScale = 0.6f;
+    [SerializeField] float aftershockMagnitudeScale = 0.78f;
 
     [Tooltip("Chance any aftershock is a big one, nearly as strong as the main shock.")]
     [Range(0f, 1f)]
-    [SerializeField] float bigAftershockChance = 0.15f;
+    [SerializeField] float bigAftershockChance = 0.28f;
 
     [Tooltip("An aftershock must reach this fraction of the main shock to bring a building down.")]
     [Range(0f, 1f)]
-    [SerializeField] float collapseThreshold = 0.45f;
+    [SerializeField] float collapseThreshold = 0.35f;
 
     [Header("Feel")]
     [Tooltip("Horizontal stumble pushed onto the player per metre of shake, in m/s.")]
-    [SerializeField] float stumblePerMetre = 3.5f;
+    [SerializeField] float stumblePerMetre = 5.5f;
 
     [Tooltip("Dust particles per second around the player at full shake.")]
-    [SerializeField] float dustRateAtFullShake = 60f;
+    [SerializeField] float dustRateAtFullShake = 90f;
 
     [Tooltip("Dust particles thrown up when a building collapses.")]
-    [SerializeField] int collapseDustBurst = 90;
+    [SerializeField] int collapseDustBurst = 130;
 
     [Tooltip("Particle material for the dust. Leave empty for no dust.")]
     [SerializeField] Material dustMaterial;
@@ -168,9 +168,9 @@ public class EarthquakeManager : MonoBehaviour
     {
         float endTime = Time.time + duration;
 
-        // Foreshock: a faint, fast rattle that tells the player to get out of the buildings.
+        // Foreshock: a hard, fast rattle that tells the player to get out of the buildings.
         quakeCount++;
-        ShakeAll(foreshockSeconds, shakeMagnitude * 0.18f);
+        ShakeAll(foreshockSeconds, shakeMagnitude * 0.28f);
         yield return new WaitForSeconds(foreshockSeconds);
 
         // Main shock.
@@ -191,16 +191,17 @@ public class EarthquakeManager : MonoBehaviour
             if (Time.time >= endTime)
                 break;
 
-            float decay = 1f / (1f + 0.12f * k);
-            float scale = aftershockMagnitudeScale * decay * Random.Range(0.55f, 1.1f);
-            if (Random.value < bigAftershockChance)
-                scale = Random.Range(0.8f, 0.95f);
+            float decay = 1f / (1f + 0.1f * k);
+            float scale = aftershockMagnitudeScale * decay * Random.Range(0.6f, 1.15f);
+            bool bigOne = Random.value < bigAftershockChance;
+            if (bigOne)
+                scale = Random.Range(0.85f, 1.05f);
 
             quakeCount++;
-            ShakeAll(aftershockShakeDuration * Mathf.Lerp(0.7f, 1.3f, scale), shakeMagnitude * scale);
+            ShakeAll(aftershockShakeDuration * Mathf.Lerp(0.75f, 1.4f, scale), shakeMagnitude * scale);
 
             if (scale >= collapseThreshold)
-                yield return CollapseNext(1);
+                yield return CollapseNext(bigOne ? 2 : 1);
         }
     }
 

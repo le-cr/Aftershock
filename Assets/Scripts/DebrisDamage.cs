@@ -7,9 +7,9 @@ using UnityEngine;
 /// </summary>
 public class DebrisDamage : MonoBehaviour
 {
-    private float damage = 0.08f;
-    private float minImpactSpeed = 2.5f;
-    private float rearmSeconds = 0.5f;
+    private float damage = 0.2f;
+    private float minImpactSpeed = 1.8f;
+    private float rearmSeconds = 0.35f;
     private float lastHitTime = float.NegativeInfinity;
 
     public void Configure(float damagePerHit, float minimumImpactSpeed, float rearm)

@@ -12,16 +12,16 @@ public class CameraShake : MonoBehaviour
 {
     [Header("Constants")]
     [Tooltip("Seconds a shake lasts when triggered with no explicit duration.")]
-    [SerializeField] float defaultDuration = 8f;
+    [SerializeField] float defaultDuration = 10f;
 
     [Tooltip("Peak offset in metres when triggered with no explicit magnitude.")]
-    [SerializeField] float defaultMagnitude = 0.35f;
+    [SerializeField] float defaultMagnitude = 0.62f;
 
     [Tooltip("How fast the shake oscillates. Higher reads as a sharper rattle.")]
-    [SerializeField] float frequency = 14f;
+    [SerializeField] float frequency = 16f;
 
     [Tooltip("Degrees of camera roll/pitch wobble per metre of positional magnitude.")]
-    [SerializeField] float rotationDegreesPerMetre = 9f;
+    [SerializeField] float rotationDegreesPerMetre = 12f;
 
     [Tooltip("The rotational wobble is slower than the positional rattle: the ground heaves, the eye jitters.")]
     [SerializeField] float rotationFrequencyScale = 0.45f;

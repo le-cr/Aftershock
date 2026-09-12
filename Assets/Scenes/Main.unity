@@ -457,19 +457,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &54791747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -489,7 +490,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -972,19 +973,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &84184359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1004,7 +1006,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -1588,19 +1590,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &105427827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1620,7 +1623,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -2936,19 +2939,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &146682168
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2968,7 +2972,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -3657,19 +3661,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &188205820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3689,7 +3694,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -4448,19 +4453,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &239278256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4480,7 +4486,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -4837,19 +4843,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &261414550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4869,7 +4876,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -5395,19 +5402,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &282419559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5427,7 +5435,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -5964,19 +5972,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &327700785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5996,7 +6005,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -6448,19 +6457,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &352627988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6480,7 +6490,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -7711,19 +7721,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &407180920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7743,7 +7754,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -8544,19 +8555,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &428210455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8576,7 +8588,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -8753,19 +8765,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &429092682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8785,7 +8798,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -9130,19 +9143,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &439270256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9162,7 +9176,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -10343,19 +10357,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &511983928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10375,7 +10390,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -11540,19 +11555,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &602052405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11572,7 +11588,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -14113,19 +14129,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &767161017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14145,7 +14162,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -14451,19 +14468,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &777522132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14483,7 +14501,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -14660,19 +14678,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &780087363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14692,7 +14711,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -15702,19 +15721,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &808695799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15734,7 +15754,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -17990,19 +18010,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &946852693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18022,7 +18043,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -19125,19 +19146,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &997294935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19157,7 +19179,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -19412,19 +19434,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1019583162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19444,7 +19467,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -19754,19 +19777,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1033204696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19786,7 +19810,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -20538,19 +20562,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1073053029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20570,7 +20595,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -21413,10 +21438,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a4b56f831804d2994a32f85490bf6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraShake
-  defaultDuration: 8
-  defaultMagnitude: 0.35
-  frequency: 14
-  rotationDegreesPerMetre: 9
+  defaultDuration: 10
+  defaultMagnitude: 0.62
+  frequency: 16
+  rotationDegreesPerMetre: 12
   rotationFrequencyScale: 0.45
 --- !u!1001 &1094092082
 PrefabInstance:
@@ -21546,19 +21571,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1099254110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21578,7 +21604,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -22952,19 +22978,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1155899405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22984,7 +23011,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -24545,21 +24572,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb13c9689645e4259a281930c7fe92f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  foreshockSeconds: 3
-  shakeDuration: 8
-  shakeMagnitude: 0.35
-  leadIn: 0.6
-  initialCollapseCount: 2
-  firstInterval: 12
-  intervalGrowth: 0.3
+  foreshockSeconds: 3.5
+  shakeDuration: 10
+  shakeMagnitude: 0.62
+  leadIn: 0.45
+  initialCollapseCount: 4
+  firstInterval: 8
+  intervalGrowth: 0.22
   defaultDuration: 120
-  aftershockShakeDuration: 4
-  aftershockMagnitudeScale: 0.6
-  bigAftershockChance: 0.15
-  collapseThreshold: 0.45
-  stumblePerMetre: 3.5
-  dustRateAtFullShake: 60
-  collapseDustBurst: 90
+  aftershockShakeDuration: 5
+  aftershockMagnitudeScale: 0.78
+  bigAftershockChance: 0.28
+  collapseThreshold: 0.35
+  stumblePerMetre: 5.5
+  dustRateAtFullShake: 90
+  collapseDustBurst: 130
   dustMaterial: {fileID: 2100000, guid: 1f96ba7a3c3ef3540b8dda1c860d8409, type: 2}
   dustColor: {r: 0.62, g: 0.55, b: 0.45, a: 0.28}
   collapseStagger: 0.45
@@ -24861,19 +24888,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1300526427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24893,7 +24921,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -25166,10 +25194,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a4b56f831804d2994a32f85490bf6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraShake
-  defaultDuration: 8
-  defaultMagnitude: 0.35
-  frequency: 14
-  rotationDegreesPerMetre: 9
+  defaultDuration: 10
+  defaultMagnitude: 0.62
+  frequency: 16
+  rotationDegreesPerMetre: 12
   rotationFrequencyScale: 0.45
 --- !u!1001 &1302885462
 PrefabInstance:
@@ -25838,19 +25866,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1357896604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25870,7 +25899,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -26626,19 +26655,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1424732807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26658,7 +26688,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -28631,19 +28661,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1536687931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28663,7 +28694,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -29807,19 +29838,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1626504050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29839,7 +29871,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -30089,7 +30121,7 @@ MonoBehaviour:
   warningSeconds: 30
   surviveSeconds: 120
   overrideRandomPick: 0
-  forcedDisaster: 3
+  forcedDisaster: 1
   disasterGroup: {fileID: 1067583971}
   disasterText: {fileID: 885519195}
   disasterTimer: {fileID: 1828585454}
@@ -31098,19 +31130,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1732965235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31130,7 +31163,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -32515,19 +32548,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1783191653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32547,7 +32581,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -34055,19 +34089,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1831639933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34087,7 +34122,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -35183,19 +35218,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &1937435085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35215,7 +35251,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1
@@ -36815,19 +36851,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingCollapse
   collapseKey: 116
-  explosionForce: 3.5
-  explosionRadius: 25
-  upwardsModifier: 0.5
+  explosionForce: 6.5
+  explosionRadius: 28
+  upwardsModifier: 0.65
   blastHeightFraction: 0.05
-  lateralScatter: 1.2
-  randomTorque: 1.2
-  fragmentDrag: 0.15
-  fragmentAngularDrag: 1.5
-  debrisDamage: 0.08
-  debrisMinImpactSpeed: 2.5
-  debrisRearmSeconds: 0.5
-  despawnFragments: 0
-  fragmentLifetime: 30
+  lateralScatter: 2.2
+  randomTorque: 2
+  fragmentDrag: 0.35
+  fragmentAngularDrag: 2.5
+  debrisDamage: 0.2
+  debrisMinImpactSpeed: 1.8
+  debrisRearmSeconds: 0.35
+  despawnFragments: 1
+  fragmentLifetime: 28
+  speculativeSeconds: 2.5
 --- !u!114 &2047101847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36847,7 +36884,7 @@ MonoBehaviour:
     triggerAllowedTags: []
     triggerKey: 0
   fractureOptions:
-    fragmentCount: 60
+    fragmentCount: 36
     xAxis: 1
     yAxis: 1
     zAxis: 1

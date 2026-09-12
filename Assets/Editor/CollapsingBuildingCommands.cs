@@ -28,7 +28,7 @@ namespace Aftershock.Editor
             [CliArg("y", "World Y position.")] float y = 0f,
             [CliArg("z", "World Z position.")] float z = 0f,
             [CliArg("scale", "Uniform scale applied to the building.")] float scale = 1f,
-            [CliArg("fragment_count", "Number of fragments to break the building into.")] int fragmentCount = 60,
+            [CliArg("fragment_count", "Number of fragments to break the building into.")] int fragmentCount = 36,
             [CliArg("inside_material", "Material for the freshly exposed interior faces.")]
             string insideMaterial = "Assets/Materials/FractureInside.mat",
             [CliArg("key", "KeyCode name that triggers the collapse.")] string key = "T")

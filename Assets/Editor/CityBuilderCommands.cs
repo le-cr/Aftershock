@@ -42,7 +42,7 @@ namespace Aftershock.Editor
             [CliArg("road_width", "Asphalt width in metres.")] float roadWidth = 6f,
             [CliArg("sidewalk_width", "Sidewalk width in metres, each side.")] float sidewalkWidth = 1.6f,
             [CliArg("building_scale", "Largest scale a building gets; smaller lots shrink it.")] float buildingScale = 8f,
-            [CliArg("fragment_count", "Fragments each building breaks into.")] int fragmentCount = 60,
+            [CliArg("fragment_count", "Fragments each building breaks into.")] int fragmentCount = 36,
             [CliArg("flatten_terrain", "Flatten the terrain under the city footprint.")] bool flattenTerrain = true)
         {
             var log = new List<string>();

@@ -54,15 +54,40 @@ public class DisasterManager : MonoBehaviour
     {
         if (atmosphere == null)
             atmosphere = FindFirstObjectByType<DisasterAtmosphere>();
+
+        ApplyPlayerSettings();
     }
 
     void Start()
     {
+        GameSettings.ApplyAudioVolume();
+
         chosenDisaster = overrideRandomPick
             ? forcedDisaster
             : (DisasterType)Random.Range(0, System.Enum.GetValues(typeof(DisasterType)).Length);
 
         BeginWarning();
+    }
+
+    /// <summary>
+    /// Pull prep / survive times and disaster choice from the main-menu settings.
+    /// A Random choice leaves the Inspector override alone (random pick).
+    /// </summary>
+    void ApplyPlayerSettings()
+    {
+        warningSeconds = GameSettings.PrepSeconds;
+        surviveSeconds = GameSettings.SurviveSeconds;
+
+        var choice = GameSettings.Disaster;
+        if (choice == GameSettings.DisasterChoice.Random)
+        {
+            overrideRandomPick = false;
+        }
+        else
+        {
+            overrideRandomPick = true;
+            forcedDisaster = (DisasterType)(int)choice;
+        }
     }
 
     private void BeginWarning()
